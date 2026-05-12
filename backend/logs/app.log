@@ -1,0 +1,446 @@
+2026-05-11 18:42:12,870 [INFO] megadl.settings: Download directory: C:\Users\ahmed1awad10\Downloads\MegaDL
+2026-05-11 18:42:12,964 [INFO] megadl.db: Database initialized
+2026-05-11 18:42:22,837 [INFO] megadl.settings: Download directory: C:\Users\ahmed1awad10\Downloads\MegaDL
+2026-05-11 18:42:22,875 [INFO] megadl.db: Database initialized
+2026-05-11 18:42:36,143 [ERROR] megadl.telegram: Telegram get_dialogs error: telethon not installed. Run: pip install telethon cryptg
+Traceback (most recent call last):
+  File "C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\services\telegram_service.py", line 58, in _get_client
+    from telethon import TelegramClient
+ImportError: cannot import name 'TelegramClient' from 'telethon' (unknown location)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\services\telegram_service.py", line 243, in get_dialogs
+    return self._run_async(_do())
+           ~~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\services\telegram_service.py", line 48, in _run_async
+    return loop.run_until_complete(coro)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Python314\Lib\asyncio\base_events.py", line 719, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\services\telegram_service.py", line 211, in _do
+    client = await self._get_client()
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\services\telegram_service.py", line 60, in _get_client
+    raise RuntimeError('telethon not installed. Run: pip install telethon cryptg')
+RuntimeError: telethon not installed. Run: pip install telethon cryptg
+2026-05-11 18:43:19,067 [INFO] megadl.settings: Download directory: C:\Users\ahmed1awad10\Downloads\MegaDL
+2026-05-11 18:43:19,099 [INFO] megadl.db: Database initialized
+2026-05-11 18:43:19,995 [ERROR] megadl.telegram: Telegram send_code error: telethon not installed. Run: pip install telethon cryptg
+Traceback (most recent call last):
+  File "C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\services\telegram_service.py", line 58, in _get_client
+    from telethon import TelegramClient
+ImportError: cannot import name 'TelegramClient' from 'telethon' (unknown location)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\services\telegram_service.py", line 106, in send_code
+    return self._run_async(_do())
+           ~~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\services\telegram_service.py", line 48, in _run_async
+    return loop.run_until_complete(coro)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Python314\Lib\asyncio\base_events.py", line 719, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\services\telegram_service.py", line 91, in _do
+    client = await self._get_client()
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\services\telegram_service.py", line 60, in _get_client
+    raise RuntimeError('telethon not installed. Run: pip install telethon cryptg')
+RuntimeError: telethon not installed. Run: pip install telethon cryptg
+2026-05-11 18:45:18,103 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 18:45:18,136 [INFO] megadl.db: Database initialized
+2026-05-11 18:45:19,365 [INFO] telethon.crypto.libssl: Failed to load SSL library: <class 'OSError'> (no library called "ssl" found)
+2026-05-11 18:45:19,375 [INFO] telethon.crypto.aes: cryptg detected, it will be used for encryption
+2026-05-11 18:45:19,860 [INFO] telethon.network.mtprotosender: Connecting to 149.154.167.51:443/TcpFull...
+2026-05-11 18:45:21,521 [INFO] telethon.network.mtprotosender: Connection to 149.154.167.51:443/TcpFull complete!
+2026-05-11 18:46:51,981 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 18:46:52,021 [INFO] megadl.db: Database initialized
+2026-05-11 18:46:53,299 [INFO] telethon.crypto.libssl: Failed to load SSL library: <class 'OSError'> (no library called "ssl" found)
+2026-05-11 18:46:53,307 [INFO] telethon.crypto.aes: cryptg detected, it will be used for encryption
+2026-05-11 18:46:53,915 [INFO] telethon.network.mtprotosender: Connecting to 149.154.167.51:443/TcpFull...
+2026-05-11 18:46:54,028 [INFO] telethon.network.mtprotosender: Connection to 149.154.167.51:443/TcpFull complete!
+2026-05-11 18:46:54,410 [INFO] megadl.telegram: Telegram client connected
+2026-05-11 18:48:50,345 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 18:48:50,423 [INFO] megadl.db: Database initialized
+2026-05-11 18:48:53,021 [INFO] telethon.crypto.libssl: Failed to load SSL library: <class 'OSError'> (no library called "ssl" found)
+2026-05-11 18:48:53,036 [INFO] telethon.crypto.aes: cryptg detected, it will be used for encryption
+2026-05-11 18:48:53,616 [INFO] telethon.network.mtprotosender: Connecting to 149.154.167.51:443/TcpFull...
+2026-05-11 18:48:53,729 [INFO] telethon.network.mtprotosender: Connection to 149.154.167.51:443/TcpFull complete!
+2026-05-11 18:48:54,146 [INFO] megadl.telegram: Telegram client connected
+2026-05-11 18:52:40,321 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 18:52:40,359 [INFO] megadl.db: Database initialized
+2026-05-11 18:52:41,426 [INFO] telethon.crypto.libssl: Failed to load SSL library: <class 'OSError'> (no library called "ssl" found)
+2026-05-11 18:52:41,647 [INFO] telethon.crypto.aes: cryptg detected, it will be used for encryption
+2026-05-11 18:52:42,146 [INFO] telethon.network.mtprotosender: Connecting to 149.154.167.51:443/TcpFull...
+2026-05-11 18:52:42,257 [INFO] telethon.network.mtprotosender: Connection to 149.154.167.51:443/TcpFull complete!
+2026-05-11 18:52:42,704 [INFO] megadl.telegram: Telegram client connected
+2026-05-11 18:53:10,361 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 18:53:10,380 [INFO] megadl.db: Database initialized
+2026-05-11 18:53:11,379 [INFO] telethon.crypto.libssl: Failed to load SSL library: <class 'OSError'> (no library called "ssl" found)
+2026-05-11 18:53:11,385 [INFO] telethon.crypto.aes: cryptg detected, it will be used for encryption
+2026-05-11 18:53:11,752 [INFO] telethon.network.mtprotosender: Connecting to 149.154.167.51:443/TcpFull...
+2026-05-11 18:53:11,865 [INFO] telethon.network.mtprotosender: Connection to 149.154.167.51:443/TcpFull complete!
+2026-05-11 18:53:12,286 [INFO] megadl.telegram: Telegram client connected
+2026-05-11 18:53:26,698 [ERROR] megadl.telegram: Telegram send_code error: The api_id/api_hash combination is invalid (caused by SendCodeRequest)
+Traceback (most recent call last):
+  File "C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\services\telegram_service.py", line 120, in send_code
+    return self._run_async(_do())
+           ~~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\services\telegram_service.py", line 48, in _run_async
+    return loop.run_until_complete(coro)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Python314\Lib\asyncio\base_events.py", line 719, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\services\telegram_service.py", line 109, in _do
+    sent = await client.send_code_request(phone)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ahmed1awad10\AppData\Roaming\Python\Python314\site-packages\telethon\client\auth.py", line 446, in send_code_request
+    result = await self(functions.auth.SendCodeRequest(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        phone, self.api_id, self.api_hash, types.CodeSettings()))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ahmed1awad10\AppData\Roaming\Python\Python314\site-packages\telethon\client\users.py", line 30, in __call__
+    return await self._call(self._sender, request, ordered=ordered)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ahmed1awad10\AppData\Roaming\Python\Python314\site-packages\telethon\client\users.py", line 92, in _call
+    result = await future
+             ^^^^^^^^^^^^
+telethon.errors.rpcerrorlist.ApiIdInvalidError: The api_id/api_hash combination is invalid (caused by SendCodeRequest)
+2026-05-11 19:02:03,165 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 19:02:03,202 [INFO] megadl.db: Database initialized
+2026-05-11 19:02:12,447 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 19:02:12,477 [INFO] megadl.db: Database initialized
+2026-05-11 19:02:44,105 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 19:02:44,140 [INFO] megadl.db: Database initialized
+2026-05-11 19:02:55,783 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 19:02:55,812 [INFO] megadl.db: Database initialized
+2026-05-11 19:02:56,344 [INFO] megadl: MegaDL starting on 0.0.0.0:5000
+2026-05-11 19:02:56,345 [INFO] megadl: Frontend: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\frontend
+2026-05-11 19:02:56,345 [INFO] megadl: Database: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\database\megadl.db
+2026-05-11 19:02:56,345 [INFO] megadl: Download queue: 3 parallel slots
+2026-05-11 19:02:56,347 [INFO] megadl.queue: Download queue started
+2026-05-11 19:02:56,355 [INFO] megadl: [WORKER] Download queue scheduler started
+2026-05-11 19:03:45,436 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 19:03:45,481 [INFO] megadl.db: Database initialized
+2026-05-11 19:03:46,024 [INFO] megadl: MegaDL starting on 0.0.0.0:5000
+2026-05-11 19:03:46,024 [INFO] megadl: Frontend: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\frontend
+2026-05-11 19:03:46,025 [INFO] megadl: Database: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\database\megadl.db
+2026-05-11 19:03:46,026 [INFO] megadl: Download queue: 3 parallel slots
+2026-05-11 19:03:46,028 [INFO] megadl.queue: Download queue started
+2026-05-11 19:03:46,033 [INFO] megadl: [WORKER] Download queue scheduler started
+2026-05-11 19:03:46,118 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.128.0.2:5000
+2026-05-11 19:03:46,118 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-05-11 19:03:50,671 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 19:03:50] "GET /api/ping HTTP/1.1" 200 -
+2026-05-11 19:03:57,232 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 19:03:57,267 [INFO] megadl.db: Database initialized
+2026-05-11 19:03:57,939 [INFO] megadl: MegaDL starting on 0.0.0.0:5000
+2026-05-11 19:03:57,946 [INFO] megadl: Frontend: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\frontend
+2026-05-11 19:03:57,947 [INFO] megadl: Database: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\database\megadl.db
+2026-05-11 19:03:57,948 [INFO] megadl: Download queue: 3 parallel slots
+2026-05-11 19:03:57,950 [INFO] megadl.queue: Download queue started
+2026-05-11 19:03:57,954 [INFO] megadl: [WORKER] Download queue scheduler started
+2026-05-11 19:03:58,017 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.128.0.2:5000
+2026-05-11 19:03:58,017 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-05-11 19:04:02,379 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 19:04:02] "GET / HTTP/1.1" 200 -
+2026-05-11 19:45:47,495 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 19:45:47,531 [INFO] megadl.db: Database initialized
+2026-05-11 20:23:18,571 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 20:23:18,614 [INFO] megadl.db: Database initialized
+2026-05-11 20:28:34,132 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 20:28:34,165 [INFO] megadl.db: Database initialized
+2026-05-11 20:28:42,866 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 20:28:42,894 [INFO] megadl.db: Database initialized
+2026-05-11 20:28:43,486 [INFO] megadl: MegaDL starting on 0.0.0.0:5000
+2026-05-11 20:28:43,486 [INFO] megadl: Frontend: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\frontend
+2026-05-11 20:28:43,486 [INFO] megadl: Database: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\database\megadl.db
+2026-05-11 20:28:43,486 [INFO] megadl: Download queue: 3 parallel slots
+2026-05-11 20:28:43,489 [INFO] megadl.queue: Download queue started
+2026-05-11 20:28:43,494 [INFO] megadl: [WORKER] Download queue scheduler started
+2026-05-11 20:28:43,589 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.128.0.2:5000
+2026-05-11 20:28:43,589 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-05-11 20:28:48,122 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 20:28:48] "GET /api/ping HTTP/1.1" 200 -
+2026-05-11 20:28:51,367 [INFO] telethon.crypto.libssl: Failed to load SSL library: <class 'OSError'> (no library called "ssl" found)
+2026-05-11 20:28:51,676 [INFO] telethon.crypto.aes: cryptg detected, it will be used for encryption
+2026-05-11 20:28:52,276 [INFO] telethon.network.mtprotosender: Connecting to 149.154.167.51:443/TcpFull...
+2026-05-11 20:28:52,390 [INFO] telethon.network.mtprotosender: Connection to 149.154.167.51:443/TcpFull complete!
+2026-05-11 20:28:52,805 [INFO] megadl.telegram: Telegram client connected
+2026-05-11 20:28:52,923 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 20:28:52] "GET /api/tg/status HTTP/1.1" 200 -
+2026-05-11 20:31:32,864 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 20:31:32,908 [INFO] megadl.db: Database initialized
+2026-05-11 20:34:02,761 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 20:34:02,791 [INFO] megadl.db: Database initialized
+2026-05-11 20:51:03,818 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 20:51:03,857 [INFO] megadl.db: Database initialized
+2026-05-11 20:52:25,440 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 20:52:25,459 [INFO] megadl.db: Database initialized
+2026-05-11 20:52:25,837 [INFO] megadl: MegaDL starting on 0.0.0.0:5000
+2026-05-11 20:52:25,837 [INFO] megadl: Frontend: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\frontend
+2026-05-11 20:52:25,838 [INFO] megadl: Database: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\database\megadl.db
+2026-05-11 20:52:25,838 [INFO] megadl: Download queue: 3 parallel slots
+2026-05-11 20:52:25,840 [INFO] megadl.queue: Download queue started
+2026-05-11 20:52:25,845 [INFO] megadl: [WORKER] Download queue scheduler started
+2026-05-11 20:52:25,898 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.128.0.2:5000
+2026-05-11 20:52:25,899 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-05-11 20:52:56,020 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 20:52:56,043 [INFO] megadl.db: Database initialized
+2026-05-11 20:52:56,424 [INFO] megadl: MegaDL starting on 0.0.0.0:5000
+2026-05-11 20:52:56,424 [INFO] megadl: Frontend: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\frontend
+2026-05-11 20:52:56,425 [INFO] megadl: Database: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\database\megadl.db
+2026-05-11 20:52:56,425 [INFO] megadl: Download queue: 3 parallel slots
+2026-05-11 20:52:56,429 [INFO] megadl.queue: Download queue started
+2026-05-11 20:52:56,435 [INFO] megadl: [WORKER] Download queue scheduler started
+2026-05-11 20:52:56,485 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.128.0.2:5000
+2026-05-11 20:52:56,485 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-05-11 20:52:59,940 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 20:52:59] "[33mGET /api/status HTTP/1.1[0m" 404 -
+2026-05-11 20:53:22,053 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 20:53:22,081 [INFO] megadl.db: Database initialized
+2026-05-11 20:53:22,596 [INFO] megadl: MegaDL starting on 0.0.0.0:5000
+2026-05-11 20:53:22,597 [INFO] megadl: Frontend: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\frontend
+2026-05-11 20:53:22,597 [INFO] megadl: Database: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\database\megadl.db
+2026-05-11 20:53:22,597 [INFO] megadl: Download queue: 3 parallel slots
+2026-05-11 20:53:22,609 [INFO] megadl.queue: Download queue started
+2026-05-11 20:53:22,614 [INFO] megadl: [WORKER] Download queue scheduler started
+2026-05-11 20:53:22,679 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.128.0.2:5000
+2026-05-11 20:53:22,679 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-05-11 20:53:27,160 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 20:53:27] "GET / HTTP/1.1" 200 -
+2026-05-11 20:53:29,211 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 20:53:29] "GET /api/ping HTTP/1.1" 200 -
+2026-05-11 20:54:00,716 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 20:54:00,738 [INFO] megadl.db: Database initialized
+2026-05-11 20:54:01,140 [INFO] megadl: MegaDL starting on 0.0.0.0:5000
+2026-05-11 20:54:01,140 [INFO] megadl: Frontend: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\frontend
+2026-05-11 20:54:01,140 [INFO] megadl: Database: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\database\megadl.db
+2026-05-11 20:54:01,140 [INFO] megadl: Download queue: 3 parallel slots
+2026-05-11 20:54:01,142 [INFO] megadl.queue: Download queue started
+2026-05-11 20:54:01,147 [INFO] megadl: [WORKER] Download queue scheduler started
+2026-05-11 20:54:01,187 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.128.0.2:5000
+2026-05-11 20:54:01,187 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-05-11 20:54:07,219 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 20:54:07] "GET /api/ping HTTP/1.1" 200 -
+2026-05-11 20:54:33,233 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 20:54:33,261 [INFO] megadl.db: Database initialized
+2026-05-11 20:54:38,876 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 20:54:38,899 [INFO] megadl.db: Database initialized
+2026-05-11 20:54:39,313 [INFO] megadl: MegaDL starting on 0.0.0.0:5000
+2026-05-11 20:54:39,313 [INFO] megadl: Frontend: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\frontend
+2026-05-11 20:54:39,314 [INFO] megadl: Database: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\database\megadl.db
+2026-05-11 20:54:39,314 [INFO] megadl: Download queue: 3 parallel slots
+2026-05-11 20:54:39,316 [INFO] megadl.queue: Download queue started
+2026-05-11 20:54:39,320 [INFO] megadl: [WORKER] Download queue scheduler started
+2026-05-11 20:54:39,362 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.128.0.2:5000
+2026-05-11 20:54:39,362 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-05-11 20:54:48,759 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 20:54:48] "GET /api/ping HTTP/1.1" 200 -
+2026-05-11 20:54:49,825 [INFO] telethon.crypto.libssl: Failed to load SSL library: <class 'OSError'> (no library called "ssl" found)
+2026-05-11 20:54:50,034 [INFO] telethon.crypto.aes: cryptg detected, it will be used for encryption
+2026-05-11 20:54:50,402 [INFO] telethon.network.mtprotosender: Connecting to 149.154.167.51:443/TcpFull...
+2026-05-11 20:54:50,514 [INFO] telethon.network.mtprotosender: Connection to 149.154.167.51:443/TcpFull complete!
+2026-05-11 20:54:50,915 [INFO] megadl.telegram: Telegram client connected
+2026-05-11 20:54:51,037 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 20:54:51] "GET /api/tg/status HTTP/1.1" 200 -
+2026-05-11 20:54:56,840 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 20:54:56] "GET / HTTP/1.1" 200 -
+2026-05-11 20:54:57,551 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 20:54:57] "GET /api/settings HTTP/1.1" 200 -
+2026-05-11 20:54:57,855 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 20:54:57] "GET /api/jobs HTTP/1.1" 200 -
+2026-05-11 21:18:32,061 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 21:18:32,093 [INFO] megadl.db: Database initialized
+2026-05-11 21:18:39,969 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 21:18:39,999 [INFO] megadl.db: Database initialized
+2026-05-11 21:18:40,620 [INFO] megadl: MegaDL starting on 0.0.0.0:5000
+2026-05-11 21:18:40,620 [INFO] megadl: Frontend: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\frontend
+2026-05-11 21:18:40,621 [INFO] megadl: Database: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\database\megadl.db
+2026-05-11 21:18:40,621 [INFO] megadl: Download queue: 3 parallel slots
+2026-05-11 21:18:40,623 [INFO] megadl.queue: Download queue started
+2026-05-11 21:18:40,629 [INFO] megadl: [WORKER] Download queue scheduler started
+2026-05-11 21:18:40,687 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.128.0.2:5000
+2026-05-11 21:18:40,687 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-05-11 21:18:52,483 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 21:18:52] "GET /api/ping HTTP/1.1" 200 -
+2026-05-11 21:18:54,676 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 21:18:54] "[33mGET /api/jobs/foo/download HTTP/1.1[0m" 404 -
+2026-05-11 21:18:57,353 [WARNING] telethon.network.connection.connection: Server closed the connection: 0 bytes read on a total of 8 expected bytes
+2026-05-11 21:18:57,357 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 21:18:57] "GET /api/tg/status HTTP/1.1" 200 -
+2026-05-11 21:18:59,685 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 21:18:59] "GET / HTTP/1.1" 200 -
+2026-05-11 21:19:21,922 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 21:19:21] "[33mGET /api/jobs/nonexistent/download HTTP/1.1[0m" 404 -
+2026-05-11 21:19:36,683 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 21:19:36] "[33mGET /api/jobs/nonexistent HTTP/1.1[0m" 404 -
+2026-05-11 21:19:49,828 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 21:19:49] "[33mGET /api/jobs/nonexistent/download HTTP/1.1[0m" 404 -
+2026-05-11 21:19:52,924 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 21:19:52] "[33mGET /api/jobs/nonexistent/download HTTP/1.1[0m" 404 -
+2026-05-11 21:20:05,811 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 21:20:05,842 [INFO] megadl.db: Database initialized
+2026-05-11 21:20:19,821 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 21:20:19,847 [INFO] megadl.db: Database initialized
+2026-05-11 21:20:20,405 [INFO] megadl: MegaDL starting on 0.0.0.0:5000
+2026-05-11 21:20:20,406 [INFO] megadl: Frontend: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\frontend
+2026-05-11 21:20:20,406 [INFO] megadl: Database: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\database\megadl.db
+2026-05-11 21:20:20,407 [INFO] megadl: Download queue: 3 parallel slots
+2026-05-11 21:20:20,409 [INFO] megadl.queue: Download queue started
+2026-05-11 21:20:20,414 [INFO] megadl: [WORKER] Download queue scheduler started
+2026-05-11 21:20:20,493 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.128.0.2:5000
+2026-05-11 21:20:20,493 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-05-11 21:20:25,144 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 21:20:25] "[33mGET /api/jobs/nonexistent/download HTTP/1.1[0m" 404 -
+2026-05-11 21:20:31,887 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 21:20:31] "[33mGET /api/jobs/nonexistent/download HTTP/1.1[0m" 404 -
+2026-05-11 21:20:40,357 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 21:20:40,385 [INFO] megadl.db: Database initialized
+2026-05-11 21:20:55,417 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 21:20:55,451 [INFO] megadl.db: Database initialized
+2026-05-11 21:20:55,999 [INFO] megadl: MegaDL starting on 0.0.0.0:5000
+2026-05-11 21:20:55,999 [INFO] megadl: Frontend: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\frontend
+2026-05-11 21:20:55,999 [INFO] megadl: Database: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\database\megadl.db
+2026-05-11 21:20:56,000 [INFO] megadl: Download queue: 3 parallel slots
+2026-05-11 21:20:56,003 [INFO] megadl.queue: Download queue started
+2026-05-11 21:20:56,007 [INFO] megadl: [WORKER] Download queue scheduler started
+2026-05-11 21:20:56,074 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.128.0.2:5000
+2026-05-11 21:20:56,074 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-05-11 21:21:16,312 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 21:21:16,352 [INFO] megadl.db: Database initialized
+2026-05-11 21:21:16,867 [INFO] megadl: MegaDL starting on 0.0.0.0:5000
+2026-05-11 21:21:16,867 [INFO] megadl: Frontend: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\frontend
+2026-05-11 21:21:16,868 [INFO] megadl: Database: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\database\megadl.db
+2026-05-11 21:21:16,868 [INFO] megadl: Download queue: 3 parallel slots
+2026-05-11 21:21:16,872 [INFO] megadl.queue: Download queue started
+2026-05-11 21:21:16,878 [INFO] megadl: [WORKER] Download queue scheduler started
+2026-05-11 21:21:16,954 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.128.0.2:5000
+2026-05-11 21:21:16,954 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-05-11 21:21:26,747 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 21:21:26] "[33mGET /api/jobs/nonexistent/download HTTP/1.1[0m" 404 -
+2026-05-11 21:21:44,682 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 21:21:44] "[33mGET /api/jobs/nonexistent/download HTTP/1.1[0m" 404 -
+2026-05-11 21:21:51,943 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 21:21:51] "[33mGET /api/jobs/nonexistent/download HTTP/1.1[0m" 404 -
+2026-05-11 21:22:02,736 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 21:22:02,803 [INFO] megadl.db: Database initialized
+2026-05-11 21:22:11,201 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 21:22:11,319 [INFO] megadl.db: Database initialized
+2026-05-11 21:22:12,041 [INFO] megadl: MegaDL starting on 0.0.0.0:5000
+2026-05-11 21:22:12,042 [INFO] megadl: Frontend: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\frontend
+2026-05-11 21:22:12,043 [INFO] megadl: Database: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\database\megadl.db
+2026-05-11 21:22:12,043 [INFO] megadl: Download queue: 3 parallel slots
+2026-05-11 21:22:12,045 [INFO] megadl.queue: Download queue started
+2026-05-11 21:22:12,050 [INFO] megadl: [WORKER] Download queue scheduler started
+2026-05-11 21:22:12,115 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.128.0.2:5000
+2026-05-11 21:22:12,115 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-05-11 21:22:22,682 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 21:22:22] "[33mGET /api/jobs/nonexistent/download HTTP/1.1[0m" 404 -
+2026-05-11 21:22:33,246 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 21:22:33] "[33mGET /api/jobs/nonexistent HTTP/1.1[0m" 404 -
+2026-05-11 21:22:35,336 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 21:22:35] "[33mGET /api/jobs/nonexistent/download HTTP/1.1[0m" 404 -
+2026-05-11 21:22:44,750 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 21:22:44,814 [INFO] megadl.db: Database initialized
+2026-05-11 21:23:00,540 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 21:23:00,565 [INFO] megadl.db: Database initialized
+2026-05-11 21:23:01,263 [INFO] megadl: MegaDL starting on 0.0.0.0:5000
+2026-05-11 21:23:01,264 [INFO] megadl: Frontend: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\frontend
+2026-05-11 21:23:01,265 [INFO] megadl: Database: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\database\megadl.db
+2026-05-11 21:23:01,265 [INFO] megadl: Download queue: 3 parallel slots
+2026-05-11 21:23:01,283 [INFO] megadl.queue: Download queue started
+2026-05-11 21:23:01,289 [INFO] megadl: [WORKER] Download queue scheduler started
+2026-05-11 21:23:01,464 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.128.0.2:5000
+2026-05-11 21:23:01,465 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-05-11 21:23:35,024 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 21:23:35,054 [INFO] megadl.db: Database initialized
+2026-05-11 21:23:36,040 [INFO] megadl: MegaDL starting on 0.0.0.0:5000
+2026-05-11 21:23:36,043 [INFO] megadl: Frontend: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\frontend
+2026-05-11 21:23:36,044 [INFO] megadl: Database: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\database\megadl.db
+2026-05-11 21:23:36,045 [INFO] megadl: Download queue: 3 parallel slots
+2026-05-11 21:23:36,047 [INFO] megadl.queue: Download queue started
+2026-05-11 21:23:36,058 [INFO] megadl: [WORKER] Download queue scheduler started
+2026-05-11 21:23:36,196 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.128.0.2:5000
+2026-05-11 21:23:36,196 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-05-11 21:24:21,310 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 21:24:21,340 [INFO] megadl.db: Database initialized
+2026-05-11 21:24:21,908 [INFO] megadl: MegaDL starting on 0.0.0.0:5000
+2026-05-11 21:24:21,911 [INFO] megadl: Frontend: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\frontend
+2026-05-11 21:24:21,912 [INFO] megadl: Database: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\database\megadl.db
+2026-05-11 21:24:21,912 [INFO] megadl: Download queue: 3 parallel slots
+2026-05-11 21:24:21,914 [INFO] megadl.queue: Download queue started
+2026-05-11 21:24:21,922 [INFO] megadl: [WORKER] Download queue scheduler started
+2026-05-11 21:24:22,010 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.128.0.2:5000
+2026-05-11 21:24:22,010 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-05-11 21:24:28,543 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 21:24:28] "GET /api/ping HTTP/1.1" 200 -
+2026-05-11 21:24:30,760 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 21:24:30] "[33mGET /api/jobs/nonexistent/download HTTP/1.1[0m" 404 -
+2026-05-11 21:24:56,009 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 21:24:56,039 [INFO] megadl.db: Database initialized
+2026-05-11 21:25:17,484 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-11 21:25:17,551 [INFO] megadl.db: Database initialized
+2026-05-11 21:25:18,050 [INFO] megadl: MegaDL starting on 0.0.0.0:5000
+2026-05-11 21:25:18,050 [INFO] megadl: Frontend: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\frontend
+2026-05-11 21:25:18,051 [INFO] megadl: Database: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\database\megadl.db
+2026-05-11 21:25:18,051 [INFO] megadl: Download queue: 3 parallel slots
+2026-05-11 21:25:18,053 [INFO] megadl.queue: Download queue started
+2026-05-11 21:25:18,058 [INFO] megadl: [WORKER] Download queue scheduler started
+2026-05-11 21:25:18,130 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.128.0.2:5000
+2026-05-11 21:25:18,131 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-05-11 21:25:24,712 [INFO] werkzeug: 127.0.0.1 - - [11/May/2026 21:25:24] "[33mGET /api/jobs/nonexistent/download HTTP/1.1[0m" 404 -
+2026-05-12 03:09:35,360 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-12 03:09:35,373 [INFO] megadl.db: Database initialized
+2026-05-12 03:09:35,995 [INFO] megadl.db: Database initialized
+2026-05-12 03:09:36,034 [INFO] megadl.db: Database initialized
+2026-05-12 03:10:51,637 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-12 03:10:51,646 [INFO] megadl.db: Database initialized
+2026-05-12 03:10:52,238 [INFO] megadl.db: Database initialized
+2026-05-12 03:10:52,379 [INFO] megadl.queue: Queued job 773064ce: https://youtube.com/test
+2026-05-12 03:10:53,953 [INFO] megadl.db: Database initialized
+2026-05-12 03:43:18,328 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-12 03:43:18,366 [INFO] megadl.db: Database initialized
+2026-05-12 03:43:18,949 [INFO] megadl: MegaDL starting on 0.0.0.0:5000
+2026-05-12 03:43:18,953 [INFO] megadl: Frontend: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\frontend
+2026-05-12 03:43:18,956 [INFO] megadl: Database: C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\database\megadl.db
+2026-05-12 03:43:18,960 [INFO] megadl: Download queue: 3 parallel slots
+2026-05-12 03:43:18,965 [INFO] megadl.queue: Download queue started
+2026-05-12 03:43:18,976 [INFO] megadl: [WORKER] Download queue scheduler started
+2026-05-12 03:43:19,071 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.128.0.2:5000
+2026-05-12 03:43:19,074 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-05-12 03:43:40,978 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-12 03:43:41,006 [INFO] megadl.db: Database initialized
+2026-05-12 03:47:48,421 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-12 03:47:48,454 [INFO] megadl.db: Database initialized
+2026-05-12 03:48:39,417 [INFO] megadl.settings: Settings loaded from C:\Users\ahmed1awad10\3D Objects\open code\MegaDL\backend\config\settings.json
+2026-05-12 03:48:39,455 [INFO] megadl.db: Database initialized
