@@ -1,0 +1,55 @@
+# ── Normalize line endings ─────────────────────────────────────
+* text=auto
+
+# ── Shell scripts ──────────────────────────────────────────────
+*.sh text eol=lf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# ── Source code ────────────────────────────────────────────────
+*.py text diff=python
+*.js text
+*.css text
+*.html text diff=html
+*.json text
+*.php text
+*.md text
+*.yml text
+*.yaml text
+*.toml text
+*.cfg text
+*.ini text
+*.txt text
+
+# ── Never merge binary files — always keep ours on conflict ────
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg -text
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+
+# ── SQLite database — binary, never merge ─────────────────────
+*.db binary
+*.db-shm binary
+*.db-wal binary
+*.sqlite binary
+*.sqlite3 binary
+
+# ── Archives and build artifacts ──────────────────────────────
+*.zip binary
+*.tar.gz binary
+*.gz binary
+*.rar binary
+*.7z binary
+
+# ── Generated / cache — use union merge ───────────────────────
+.gitignore -merge
+.gitattributes -merge
+*.log -merge
+*.session -merge
+settings.json -merge
