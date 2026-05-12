@@ -412,6 +412,382 @@ class TestYtdlpService(unittest.TestCase):
         self.assertEqual(norm['duration'], 300)
         self.assertEqual(len(norm['formats']), 1)
 
+# ── Channel Mode Tests ───────────────────────────────────────────
+class TestChannelMode(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        from database.db import Database
+        from config.settings import Settings
+        from services.ytdlp_service import YtdlpService
+        cls.db = Database(TEST_DB)
+        cls.db.initialize()
+        cls.settings = Settings.__new__(Settings)
+        cls.settings._data = dict(TEST_SETTINGS)
+        cls.settings._path = str(BASE_DIR / 'tests' / 'test_settings.json')
+        cls.svc = YtdlpService(cls.settings, cls.db)
+
+    def test_01_is_channel_mode_true(self):
+        for mode in ('playlists_only', 'uploads_only', 'playlists_and_uploads',
+                      'all_uncategorized', 'latest_since_last_run'):
+            self.assertTrue(self.svc.is_channel_mode({'mode': mode}),
+                            f'{mode} should be detected as channel mode')
+
+    def test_02_is_channel_mode_false(self):
+        for mode in ('single', 'playlist', 'unlisted_playlist', 'audio_only', 'video_only', ''):
+            self.assertFalse(self.svc.is_channel_mode({'mode': mode}),
+                             f'{mode!r} should NOT be detected as channel mode')
+
+    def test_03_is_channel_mode_empty_opts(self):
+        self.assertFalse(self.svc.is_channel_mode({}))
+
+    def test_04_build_output_path_channel_uploads(self):
+        path = self.svc._build_output_path(
+            '/downloads',
+            'https://youtube.com/@channel',
+            {'uploader': 'TestChannel', 'channel': 'TestChannel'},
+            {'mode': 'uploads_only'}
+        )
+        self.assertIn('TestChannel', path)
+        self.assertIn('Uploads', path)
+        self.assertIn('%(id)s', path)
+
+    def test_05_build_output_path_channel_playlist(self):
+        path = self.svc._build_output_path(
+            '/downloads',
+            'https://youtube.com/playlist?list=PLtest',
+            {'uploader': 'TestChannel', 'playlist_id': 'PLtest', 'playlist_title': 'My Playlist'},
+            {'mode': 'playlist'}
+        )
+        self.assertIn('TestChannel', path)
+        self.assertIn('Playlists', path)
+        self.assertIn('My Playlist', path)
+
+    def test_06_build_output_path_standalone_playlist(self):
+        path = self.svc._build_output_path(
+            '/downloads',
+            'https://youtube.com/playlist?list=PLtest',
+            {'playlist_id': 'PLtest', 'playlist_title': 'My List'},
+            {'mode': 'playlist'}
+        )
+        self.assertIn('Playlist_PLtest', path)
+
+    def test_07_build_output_path_facebook(self):
+        path = self.svc._build_output_path(
+            '/downloads',
+            'https://facebook.com/watch?v=test',
+            {},
+            {'mode': 'single'}
+        )
+        self.assertIn('facebook.com', path)
+
+    def test_08_build_output_path_latest(self):
+        path = self.svc._build_output_path(
+            '/downloads',
+            'https://youtube.com/@channel',
+            {'uploader': 'TestChannel'},
+            {'mode': 'latest'}
+        )
+        self.assertIn('Latest', path)
+
+    def test_09_build_output_path_uncategorized(self):
+        path = self.svc._build_output_path(
+            '/downloads',
+            'https://youtube.com/@channel',
+            {'uploader': 'TestChannel'},
+            {'mode': 'uncategorized'}
+        )
+        self.assertIn('Uncategorized', path)
+
+    def test_10_detect_platform(self):
+        self.assertEqual(self.svc._detect_platform('https://youtube.com/watch?v=test'), 'youtube')
+        self.assertEqual(self.svc._detect_platform('https://youtu.be/test'), 'youtube')
+        self.assertEqual(self.svc._detect_platform('https://facebook.com/video'), 'facebook')
+        self.assertEqual(self.svc._detect_platform('https://fb.watch/test'), 'facebook')
+        self.assertEqual(self.svc._detect_platform('https://instagram.com/p/test'), 'instagram')
+        self.assertEqual(self.svc._detect_platform('https://tiktok.com/@user/video'), 'tiktok')
+        self.assertEqual(self.svc._detect_platform('https://twitter.com/user/status/123'), 'twitter')
+        self.assertEqual(self.svc._detect_platform('https://example.com/video'), 'other')
+
+    def test_11_channel_metadata_write(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            path = str(Path(tmp) / 'TestChannel')
+            self.svc._write_last_run(Path(path))
+            last_run = Path(path) / '.last_run'
+            self.assertTrue(last_run.exists())
+            ts = last_run.read_text(encoding='utf-8')
+            self.assertIn('20', ts)  # year prefix
+
+    def test_12_latest_per_channel_roundtrip(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            self.svc.settings._data['dl_folder'] = tmp
+            self.svc.save_latest_per_channel('UCtest1234', 'video_01', '20260511')
+            self.svc.save_latest_per_channel('UCtest1234', 'video_02', '20260512')
+            report = self.svc.get_latest_per_channel()
+            self.assertIn('UCtest1234', report)
+            self.assertEqual(report['UCtest1234']['video_id'], 'video_02')
+            self.assertEqual(report['UCtest1234']['upload_date'], '20260512')
+
+    def test_13_filter_latest_only(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            self.svc.settings._data['dl_folder'] = tmp
+            self.svc.save_latest_per_channel('UCfilter_test_1234567890', 'old_vid', '20260501')
+            videos = [
+                {'id': 'v1', 'upload_date': '20260401'},
+                {'id': 'v2', 'upload_date': '20260515'},
+                {'id': 'v3', 'upload_date': '20260502'},
+            ]
+            from unittest.mock import patch
+            with patch.object(self.svc, '_get_channel_id', return_value='UCfilter_test_1234567890'):
+                filtered = self.svc.filter_latest_only('https://youtube.com/channel/UCfilter_test_1234567890', videos)
+                self.assertEqual(len(filtered), 2)
+                self.assertEqual(filtered[0]['id'], 'v2')
+                self.assertEqual(filtered[1]['id'], 'v3')
+
+    def test_14_url_pattern_detection(self):
+        import re
+        test_cases = [
+            ('https://youtube.com/channel/UCabc123def456ghi789jkl0', True),
+            ('https://youtube.com/@handle', True),
+            ('https://youtube.com/c/CustomName', True),
+            ('https://youtube.com/user/RealUser', True),
+            ('https://youtube.com/watch?v=test', False),
+        ]
+        channel_pattern = re.compile(r'youtube\.com/(@|channel/|c/|user/)')
+        for url, expected in test_cases:
+            self.assertEqual(bool(channel_pattern.search(url)), expected,
+                             f'{url} should match={expected}')
+
+
+# ── Telegram Bot Scorer Tests ──────────────────────────────────
+class TestTelegramBotScorer(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        from config.settings import Settings
+        from services.tg_bot_scorer import TelegramBotScorer, BotStats
+        cls.Settings = Settings
+        cls.TelegramBotScorer = TelegramBotScorer
+        cls.BotStats = BotStats
+
+    def setUp(self):
+        import tempfile
+        self.tmp = tempfile.TemporaryDirectory()
+        from config.settings import Settings
+        s = Settings.__new__(Settings)
+        s._data = {'dl_folder': self.tmp.name}
+        self.scorer = self.TelegramBotScorer(s)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_01_register_and_score(self):
+        self.scorer.register_bot('123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11')
+        score = self.scorer.get_bot_score('123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11')
+        self.assertGreaterEqual(score, 0)
+        self.assertLessEqual(score, 1)
+
+    def test_02_fail_rate_calculation(self):
+        stats = self.BotStats(token='test', total_downloaded=8, total_failed=2)
+        self.assertAlmostEqual(stats.fail_rate, 0.2)
+
+    def test_03_weighted_scoring(self):
+        # Fresh bot with no history should get moderate score
+        self.scorer.register_bot('bot_fresh:xxx')
+        score = self.scorer.get_bot_score('bot_fresh:xxx')
+        # No load, no fail rate = good, but no speed = lower
+        self.assertGreater(score, 0.3)
+
+    def test_04_select_best_bot(self):
+        tokens = ['bot_a:aaa', 'bot_b:bbb', 'bot_c:ccc']
+        for t in tokens:
+            self.scorer.register_bot(t)
+        # Record some successes/failures to differentiate
+        self.scorer.record_success('bot_a:aaa', 5_000_000)  # 5 MB/s
+        self.scorer.record_success('bot_a:aaa', 8_000_000)
+        self.scorer.record_failure('bot_c:ccc')
+        self.scorer.record_failure('bot_c:ccc')
+
+        best = self.scorer.select_best_bot(tokens)
+        # bot_a should be best (good speed, no failures)
+        self.assertEqual(best, 'bot_a:aaa')
+
+    def test_05_score_differentiation(self):
+        tokens = ['fast:aaa', 'slow:bbb', 'flaky:ccc']
+        for t in tokens:
+            self.scorer.register_bot(t)
+
+        self.scorer.record_success('fast:aaa', 10_000_000)  # 10 MB/s
+        self.scorer.record_success('slow:bbb', 500_000)      # 0.5 MB/s
+        self.scorer.record_success('flaky:ccc', 2_000_000)
+        self.scorer.record_failure('flaky:ccc')
+
+        scores = self.scorer.get_all_scores()
+        # First should be fast bot
+        self.assertIn('fast', scores[0]['token_masked'])
+
+    def test_06_record_removal(self):
+        self.scorer.register_bot('remove_me:token')
+        self.assertIn('remove_me:token', self.scorer._bots)
+        self.scorer.remove_bot('remove_me:token')
+        self.assertNotIn('remove_me:token', self.scorer._bots)
+
+
+# ── Telegram Filename Service Tests ────────────────────────────
+class TestTelegramFilenameService(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        try:
+            from services.tg_filename_service import TelegramFilenameService
+            cls.svc = TelegramFilenameService()
+            cls.available = True
+        except ImportError:
+            cls.available = False
+
+    def setUp(self):
+        if not self.available:
+            self.skipTest('telethon not installed')
+
+    def test_01_extract_filename_from_attributes(self):
+        from unittest.mock import MagicMock
+        msg = MagicMock()
+        msg.message = None
+        msg.media = True
+        msg.document = MagicMock()
+        msg.document.attributes = []
+        msg.photo = None
+        msg.file = MagicMock()
+        msg.file.name = 'report.pdf'
+        msg.file.ext = '.pdf'
+        fname = self.svc.get_original_filename(msg)
+        self.assertIsNotNone(fname)
+
+    def test_02_get_original_filename(self):
+        from unittest.mock import MagicMock
+        msg = MagicMock()
+        msg.media = False
+        msg.document = None
+        msg.photo = None
+        msg.video = None
+        msg.audio = None
+        msg.voice = None
+        msg.text = ''
+        msg.date = None
+        msg.id = 999
+        msg.file = MagicMock()
+        msg.file.ext = ''
+        msg.file.name = ''
+        fname = self.svc.get_original_filename(msg)
+        # Falls through to Layer 6 (message ID) since all checks fail
+        self.assertIn('999', fname)
+
+    def test_03_extract_info_debug_photo(self):
+        from unittest.mock import MagicMock
+        msg = MagicMock()
+        msg.media = True
+        msg.document = None
+        msg.photo = MagicMock()
+        msg.video = None
+        msg.audio = None
+        msg.voice = None
+        msg.text = ''
+        msg.id = 123
+        msg.date = None
+        msg.file = MagicMock()
+        msg.file.name = ''
+        msg.file.ext = '.jpg'
+        info = self.svc.extract_filename_info(msg)
+        self.assertIn('filename', info)
+        self.assertIn('extension', info)
+        self.assertIn('media_type', info)
+        self.assertEqual(info['media_type'], 'photo')
+
+
+# ── Telegram Resume Service Tests ──────────────────────────────
+class TestTelegramResumeService(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        from config.settings import Settings
+        from services.tg_resume_service import TelegramResumeService
+        cls.Settings = Settings
+        cls.TelegramResumeService = TelegramResumeService
+
+    def setUp(self):
+        import tempfile
+        self.tmp = tempfile.TemporaryDirectory()
+        s = self.Settings.__new__(self.Settings)
+        s._data = {'dl_folder': self.tmp.name}
+        self.resume = self.TelegramResumeService(s)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_01_init_job(self):
+        job = self.resume.init_job('job_001', 12345, 678, '/tmp/test.mp4', 1_000_000)
+        self.assertEqual(job['job_id'], 'job_001')
+        self.assertEqual(job['dialog_id'], 12345)
+        self.assertEqual(job['msg_id'], 678)
+        self.assertEqual(job['total_size'], 1_000_000)
+        self.assertEqual(job['downloaded_bytes'], 0)
+        self.assertEqual(job['status'], 'paused')  # starts as paused
+
+    def test_02_update_progress(self):
+        self.resume.init_job('job_002', 111, 222, '/tmp/test.mp4', 500_000)
+        self.resume.update_progress('job_002', 250_000)
+        jobs = self.resume.get_active_jobs()
+        # get_active_jobs returns dict of job_id -> job
+        self.assertIn('job_002', jobs)
+        self.assertEqual(jobs['job_002']['downloaded_bytes'], 250_000)
+
+    def test_03_pause_applies_rollback(self):
+        self.resume.init_job('job_003', 111, 222, '/tmp/test.mp4', 2_000_000)
+        self.resume.update_progress('job_003', 500_000)
+        self.resume.mark_paused('job_003')
+        offset = self.resume.get_resume_offset('job_003')
+        # job stores rollback_offset separately (not recalculated)
+        job = self.resume.get_job('job_003')
+        self.assertEqual(job['rollback_offset'], 0)  # 500KB < 2MB rollback
+        # Actual resume offset uses rollback_offset or downloaded_bytes
+        self.assertEqual(offset, 0)  # rollback_offset=0 since 500KB < 2MB
+
+    def test_04_mark_completed(self):
+        self.resume.init_job('job_004', 111, 222, '/tmp/test.mp4', 100_000)
+        self.resume.update_progress('job_004', 100_000)
+        self.resume.mark_completed('job_004')
+        job = self.resume.get_active_jobs()
+        active = [j for j in job if j['job_id'] == 'job_004']
+        self.assertEqual(len(active), 0)  # Completed jobs removed from active
+
+    def test_05_mark_failed(self):
+        self.resume.init_job('job_005', 111, 222, '/tmp/test.mp4', 100_000)
+        self.resume.mark_failed('job_005', 'Connection lost')
+        stats = self.resume.get_job_stats()
+        self.assertIn('failed', stats)
+        self.assertGreaterEqual(stats['failed'], 1)
+
+    def test_06_get_resume_offset_no_job(self):
+        offset = self.resume.get_resume_offset('nonexistent_job')
+        self.assertEqual(offset, 0)
+
+
+# ── Telegram Scan Service Tests ────────────────────────────────
+class TestTelegramScanService(unittest.TestCase):
+    def test_01_format_size(self):
+        from services.tg_scan_service import TelegramScanService
+        self.assertEqual(TelegramScanService.format_size(0), '0.00 B')
+        self.assertEqual(TelegramScanService.format_size(1024), '1.00 KB')
+        self.assertEqual(TelegramScanService.format_size(1_048_576), '1.00 MB')
+        self.assertEqual(TelegramScanService.format_size(1_073_741_824), '1.00 GB')
+
+    def test_02_estimate_download_time(self):
+        from services.tg_scan_service import TelegramScanService
+        s = TelegramScanService.__new__(TelegramScanService)
+        # 10 MB at 1 MB/s = 10 seconds
+        time = s.estimate_download_time(10_000_000, 1_000_000)
+        self.assertAlmostEqual(time, 10.0, places=1)
+
+
 # ── Frontend File Tests ─────────────────────────────────────────
 class TestFrontend(unittest.TestCase):
     def test_01_index_html_exists(self):
@@ -500,6 +876,11 @@ if __name__ == '__main__':
         loader.loadTestsFromTestCase(TestDownloadQueue),
         loader.loadTestsFromTestCase(TestFlaskAPI),
         loader.loadTestsFromTestCase(TestYtdlpService),
+        loader.loadTestsFromTestCase(TestChannelMode),
+        loader.loadTestsFromTestCase(TestTelegramBotScorer),
+        loader.loadTestsFromTestCase(TestTelegramFilenameService),
+        loader.loadTestsFromTestCase(TestTelegramResumeService),
+        loader.loadTestsFromTestCase(TestTelegramScanService),
         loader.loadTestsFromTestCase(TestFrontend),
         loader.loadTestsFromTestCase(TestProjectStructure),
     ]

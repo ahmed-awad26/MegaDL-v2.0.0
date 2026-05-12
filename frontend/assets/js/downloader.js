@@ -121,7 +121,7 @@ MegaDL.Downloader = (() => {
     return {
       quality:        $('quality-select')?.value  || settings.defQuality || 'best',
       format:         $('format-select')?.value   || 'mp4',
-      mode:           $('mode-select')?.value     || 'single',
+      mode:           _getEffectiveMode(),
       embedSubs:      $('opt-subs')?.checked      || settings.embedSubs   || false,
       embedThumb:     $('opt-thumb')?.checked     || settings.embedThumb  || true,
       embedMeta:      $('opt-meta')?.checked      || settings.embedMeta   || true,
@@ -161,6 +161,31 @@ MegaDL.Downloader = (() => {
   /* ── Detect YouTube channel URLs ─────────────────────────── */
   function _isChannelUrl(url) {
     return /youtube\.com\/(@|channel\/|c\/|user\/)/i.test(url);
+  }
+
+  function _showChannelModeOptions(show) {
+    const group = $('channel-mode-group');
+    if (group) group.style.display = show ? 'block' : 'none';
+    if (!show) {
+      // Reset mode to single when not a channel
+      const modeSelect = $('mode-select');
+      if (modeSelect && modeSelect.value === 'single') return;
+    }
+  }
+
+  function _getEffectiveMode() {
+    const mode = $('mode-select')?.value || 'single';
+    const channelMode = $('channel-mode-select')?.value;
+    const isChannel = _isChannelUrl($('url-input')?.value || '');
+    if (isChannel && channelMode && channelMode !== 'none') {
+      return channelMode;
+    }
+    return mode;
+  }
+
+  function _isChannelMode(mode) {
+    return ['playlists_only', 'uploads_only', 'playlists_and_uploads',
+            'all_uncategorized', 'latest_since_last_run'].includes(mode);
   }
 
   function _showPlaylistSelector(url, playlists) {
@@ -277,11 +302,12 @@ MegaDL.Downloader = (() => {
       return;
     }
 
-    // Check for YouTube channel URL → show playlist selector
+    // Check for YouTube channel URL → show channel mode & playlist selector
     if (_isChannelUrl(safeUrl)) {
+      _showChannelModeOptions(true);
       isFetching = true;
       const btn = $('fetch-info-btn');
-      if (btn) { btn.disabled = true; btn.innerHTML = `<span class="loading-spinner sm"></span><span>Loading playlists...</span>`; }
+      if (btn) { btn.disabled = true; btn.innerHTML = `<span class="loading-spinner sm"></span><span>Loading channel...</span>`; }
       try {
         const res = await API.getChannelPlaylists(safeUrl);
         if (res.playlists && res.playlists.length > 0) {
@@ -299,6 +325,8 @@ MegaDL.Downloader = (() => {
         if (btn) { btn.disabled = false; btn.innerHTML = `<span class="btn-icon">🔍</span><span>Fetch Info</span>`; }
       }
       return;
+    } else {
+      _showChannelModeOptions(false);
     }
 
     isFetching = true;
@@ -572,6 +600,75 @@ MegaDL.Downloader = (() => {
       MegaDL.App?.toast('⚠️ URL blocked or invalid', 'error');
       return;
     }
+
+    const opts = { ..._buildOptions() };
+    if (format?.id)  opts.format_id  = format.id;
+    if (format?.ext) opts.format_ext = format.ext;
+
+    // Handle YouTube channel modes — queue the channel URL with mode flag
+    if (_isChannelMode(opts.mode)) {
+      const btn = $('download-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span class="loading-spinner sm"></span><span>Queuing channel...</span>`;
+      }
+      try {
+        // For channel modes, queue the channel URL directly — backend handles the logic
+        const res = await API.startDownload(safeUrl, opts);
+        haptic('success');
+        const modeLabels = {
+          playlists_only: '📂 Playlists',
+          uploads_only: '📤 Uploads',
+          playlists_and_uploads: '📂+📤 Playlists+Uploads',
+          all_uncategorized: '📂+📤+📁 All+Uncategorized',
+          latest_since_last_run: '🆕 Latest',
+        };
+        MegaDL.App?.toast(`⬇️ ${modeLabels[opts.mode] || opts.mode} queued!`, 'success');
+        _resetAfterDownload();
+        MegaDL.Router.navigate('active');
+      } catch (err) {
+        MegaDL.App?.toast(`❌ ${err.message}`, 'error');
+      } finally {
+        const btn2 = $('download-btn');
+        if (btn2) { btn2.disabled = false; btn2.innerHTML = `<span>⬇️ Download</span>`; }
+      }
+      return;
+    }
+
+    const btn = $('download-btn');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<span class="loading-spinner sm"></span><span>Queuing...</span>`;
+    }
+
+    try {
+      const res = await API.startDownload(safeUrl, opts);
+      haptic('success');
+      MegaDL.App?.toast(`⬇️ Download queued!`, 'success');
+
+      // Clear input
+      _resetAfterDownload();
+
+      // Navigate to active jobs
+      MegaDL.Router.navigate('active');
+    } catch (err) {
+      MegaDL.App?.toast(`❌ ${err.message}`, 'error');
+    } finally {
+      const btn2 = $('download-btn');
+      if (btn2) {
+        btn2.disabled = false;
+        btn2.innerHTML = `<span>⬇️ Download</span>`;
+      }
+    }
+  }
+
+  function _resetAfterDownload() {
+    const input = $('url-input');
+    if (input) input.value = '';
+    hide('video-info-card');
+    currentInfo   = null;
+    selectedFormat = null;
+  }
 
     const opts = { ..._buildOptions() };
     if (format?.id)  opts.format_id  = format.id;

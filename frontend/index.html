@@ -228,12 +228,25 @@
               <div class="option-group">
                 <label class="option-label">Mode</label>
                 <select class="option-select" id="mode-select">
-                  <option value="single">Single</option>
+                  <option value="single">Single Video</option>
                   <option value="playlist">Playlist</option>
                   <option value="unlisted_playlist">Unlisted Playlist</option>
                   <option value="audio_only">Audio Only</option>
                   <option value="video_only">Video Only</option>
                 </select>
+                <div id="channel-mode-group" style="display:none;margin-top:8px">
+                  <label class="option-label">YouTube Channel Mode</label>
+                  <select class="option-select" id="channel-mode-select">
+                    <option value="playlists_only">📂 Playlists only</option>
+                    <option value="uploads_only">📤 Uploads only</option>
+                    <option value="playlists_and_uploads">📂+📤 Playlists + Uploads</option>
+                    <option value="all_uncategorized">📂+📤+📁 All + Uncategorized</option>
+                    <option value="latest_since_last_run">🆕 Latest since last run</option>
+                  </select>
+                  <div class="setting-desc" style="font-size:0.75rem;margin-top:4px">
+                    Channel modes download all content with automatic folder organization
+                  </div>
+                </div>
               </div>
             </div>
 
