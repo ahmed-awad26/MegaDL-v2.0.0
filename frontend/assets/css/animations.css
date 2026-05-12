@@ -1,0 +1,302 @@
+/* ============================================================
+   MegaDL — Animations CSS
+   Android-like motion · Spring physics · Material motion
+   ============================================================ */
+
+/* ─── Keyframes ──────────────────────────────────────────────── */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideLeft {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideRight {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes splashFadeIn {
+  from { opacity: 0; transform: translateY(30px) scale(0.9); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes splashBounce {
+  0%   { transform: scale(0.5) rotate(-15deg); opacity: 0; }
+  60%  { transform: scale(1.15) rotate(5deg); opacity: 1; }
+  80%  { transform: scale(0.95) rotate(-3deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+@keyframes splashProgress {
+  0%   { transform: translateX(-100%); }
+  50%  { transform: translateX(250%); }
+  100% { transform: translateX(-100%); }
+}
+
+@keyframes shimmer {
+  0%   { left: -100%; }
+  100% { left: 200%; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.9); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes toastOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(20px) scale(0.9); }
+}
+
+@keyframes ripple {
+  from { transform: scale(0); opacity: 0.5; }
+  to   { transform: scale(4); opacity: 0; }
+}
+
+@keyframes skeletonWave {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+@keyframes progressIndeterminate {
+  0%   { left: -35%; right: 100%; }
+  60%  { left: 100%; right: -90%; }
+  100% { left: 100%; right: -90%; }
+}
+
+@keyframes fabPulse {
+  0%, 100% { box-shadow: 0 4px 20px var(--accent-glow); }
+  50%       { box-shadow: 0 4px 36px var(--accent-glow), 0 0 0 8px rgba(108,99,255,0.1); }
+}
+
+@keyframes borderGlow {
+  0%, 100% { border-color: var(--glass-border); }
+  50%       { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-dim); }
+}
+
+@keyframes downloadComplete {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.05); }
+  60%  { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+
+@keyframes errorShake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-6px); }
+  40%       { transform: translateX(6px); }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX(4px); }
+}
+
+/* ─── Utility Animation Classes ──────────────────────────────── */
+
+.animate-fade-in   { animation: fadeIn var(--dur-normal) var(--transition); }
+.animate-slide-up  { animation: slideUp var(--dur-normal) var(--transition-spring); }
+.animate-slide-down { animation: slideDown var(--dur-normal) var(--transition); }
+.animate-pulse     { animation: pulse 2s infinite; }
+.animate-spin      { animation: spin 1s linear infinite; }
+.animate-shimmer   { animation: shimmer 1.5s infinite; }
+
+/* Stagger delays */
+.stagger-1  { animation-delay: 50ms; }
+.stagger-2  { animation-delay: 100ms; }
+.stagger-3  { animation-delay: 150ms; }
+.stagger-4  { animation-delay: 200ms; }
+.stagger-5  { animation-delay: 250ms; }
+
+/* ─── Skeleton Loading ───────────────────────────────────────── */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.04) 75%
+  );
+  background-size: 800px 100%;
+  animation: skeletonWave 1.5s infinite;
+  border-radius: var(--border-radius-sm);
+}
+
+.skeleton-line {
+  height: 14px;
+  margin-bottom: 8px;
+  border-radius: 7px;
+}
+
+.skeleton-line.sm { height: 10px; }
+.skeleton-line.lg { height: 20px; }
+.skeleton-line.short { width: 60%; }
+.skeleton-line.med { width: 80%; }
+
+.skeleton-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius);
+  padding: 14px;
+  margin-bottom: 10px;
+}
+
+.skeleton-thumb {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: var(--border-radius-sm);
+  margin-bottom: 10px;
+}
+
+/* ─── Ripple Effect ──────────────────────────────────────────── */
+
+.ripple-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-wave {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  pointer-events: none;
+  animation: ripple 0.6s var(--transition) forwards;
+}
+
+/* ─── Progress Bar Variants ──────────────────────────────────── */
+
+.progress-indeterminate .job-progress-fill {
+  width: 35% !important;
+  animation: progressIndeterminate 1.5s var(--transition) infinite;
+  position: relative;
+}
+
+/* ─── Page Transitions ───────────────────────────────────────── */
+
+.page-enter {
+  animation: pageFadeIn var(--dur-normal) var(--transition) both;
+}
+
+.page-exit {
+  animation: pageFadeIn var(--dur-fast) var(--transition) reverse both;
+}
+
+/* ─── Job Card State Animations ──────────────────────────────── */
+
+.job-card.just-done {
+  animation: downloadComplete 0.5s var(--transition-spring);
+}
+
+.job-card.just-error {
+  animation: errorShake 0.5s var(--transition);
+}
+
+/* ─── FAB attention animation ────────────────────────────────── */
+
+.fab.attention {
+  animation: fabPulse 2s var(--transition) infinite;
+}
+
+/* ─── Speed indicator color ──────────────────────────────────── */
+
+.speed-fast   { color: var(--success) !important; }
+.speed-medium { color: var(--warning) !important; }
+.speed-slow   { color: var(--error) !important; }
+
+/* ─── Smooth transitions for interactive elements ────────────── */
+
+.smooth-transition {
+  transition: all var(--dur-normal) var(--transition);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+/* ─── Loading spinner ────────────────────────────────────────── */
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.15);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+.loading-spinner.sm { width: 14px; height: 14px; }
+.loading-spinner.lg { width: 32px; height: 32px; border-width: 3px; }
+
+/* ─── Animated gradient border ───────────────────────────────── */
+
+.gradient-border {
+  position: relative;
+  background: var(--glass-bg);
+  border-radius: var(--border-radius);
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2), var(--accent));
+  background-size: 200% 200%;
+  z-index: -1;
+  animation: gradientShift 3s linear infinite;
+  opacity: 0;
+  transition: opacity var(--dur-normal);
+}
+
+.gradient-border:focus-within::before { opacity: 1; }
+
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ─── Reduced motion support ─────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "name": "MegaDL — Download Manager",
+  "short_name": "MegaDL",
+  "description": "Professional download manager for YouTube, TikTok, Instagram and 1000+ sites",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#000000",
+  "theme_color": "#0a0a0f",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    { "src": "assets/icons/icon-72.png",   "sizes": "72x72",   "type": "image/png" },
+    { "src": "assets/icons/icon-96.png",   "sizes": "96x96",   "type": "image/png" },
+    { "src": "assets/icons/icon-128.png",  "sizes": "128x128", "type": "image/png" },
+    { "src": "assets/icons/icon-192.png",  "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "assets/icons/icon-512.png",  "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Download",
+      "short_name": "Download",
+      "description": "Start a new download",
+      "url": "/#home",
+      "icons": [{ "src": "assets/icons/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Active Jobs",
+      "short_name": "Active",
+      "description": "View active downloads",
+      "url": "/#active",
+      "icons": [{ "src": "assets/icons/icon-96.png", "sizes": "96x96" }]
+    }
+  ],
+  "screenshots": [
+    { "src": "assets/screenshots/home.png", "sizes": "390x844", "type": "image/png", "form_factor": "narrow" }
+  ]
+}

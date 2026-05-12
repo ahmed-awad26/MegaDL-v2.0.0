@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="MegaDL" />
+  <meta name="description" content="MegaDL — Professional Download Manager" />
+
+  <title>MegaDL</title>
+
+  <!-- PWA manifest -->
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- Icons -->
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+
+  <!-- Fonts: Outfit (display) + JetBrains Mono (code) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Core styles -->
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/animations.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/pages.css" />
+</head>
+<body class="app-body">
+
+  <!-- Splash Screen -->
+  <div id="splash-screen" class="splash">
+    <div class="splash-content">
+      <div class="splash-logo">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+          <circle cx="32" cy="32" r="32" fill="url(#splashGrad)"/>
+          <path d="M32 14 L32 38 M22 28 L32 40 L42 28" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="16" y="44" width="32" height="4" rx="2" fill="white" opacity="0.8"/>
+          <defs>
+            <linearGradient id="splashGrad" x1="0" y1="0" x2="64" y2="64">
+              <stop offset="0%" stop-color="#6c63ff"/>
+              <stop offset="100%" stop-color="#a855f7"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="splash-title">MegaDL</div>
+      <div class="splash-subtitle">Download Manager</div>
+      <div class="splash-loader">
+        <div class="splash-progress"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Root -->
+  <div id="app" class="app" style="display:none">
+
+    <!-- Mobile Top Bar -->
+    <header class="app-topbar" id="topbar">
+      <div class="topbar-left">
+        <button class="icon-btn" id="menu-btn" aria-label="Menu">
+          <span class="material-icon">☰</span>
+        </button>
+        <div class="topbar-logo">
+          <span class="logo-icon">↓</span>
+          <span class="logo-text">MegaDL</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn" id="search-btn" aria-label="Search">🔍</button>
+        <button class="icon-btn" id="notif-btn" aria-label="Notifications">
+          🔔
+          <span class="notif-badge" id="notif-badge" style="display:none">0</span>
+        </button>
+        <button class="icon-btn" id="overflow-btn" aria-label="More">⋮</button>
+      </div>
+    </header>
+
+    <!-- Desktop Sidebar -->
+    <aside class="app-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <div class="sidebar-logo-icon">↓</div>
+          <div class="sidebar-logo-text">
+            <span class="sidebar-app-name">MegaDL</span>
+            <span class="sidebar-app-version" id="app-version">v2.0.0</span>
+          </div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Main</div>
+        <a class="nav-item active" data-page="home" href="#home">
+          <span class="nav-icon">🏠</span>
+          <span class="nav-label">Home</span>
+        </a>
+        <a class="nav-item" data-page="downloads" href="#downloads">
+          <span class="nav-icon">⬇️</span>
+          <span class="nav-label">Downloads</span>
+          <span class="nav-badge" id="dl-badge" style="display:none">0</span>
+        </a>
+        <a class="nav-item" data-page="active" href="#active">
+          <span class="nav-icon">▶️</span>
+          <span class="nav-label">Active Jobs</span>
+          <span class="nav-badge active-badge" id="active-badge" style="display:none">0</span>
+        </a>
+        <a class="nav-item" data-page="queue" href="#queue">
+          <span class="nav-icon">📋</span>
+          <span class="nav-label">Batch Queue</span>
+        </a>
+        <div class="nav-section-label">Library</div>
+        <a class="nav-item" data-page="archive" href="#archive">
+          <span class="nav-icon">📦</span>
+          <span class="nav-label">Archive</span>
+        </a>
+        <a class="nav-item" data-page="history" href="#history">
+          <span class="nav-icon">🕒</span>
+          <span class="nav-label">History</span>
+        </a>
+        <a class="nav-item" data-page="favorites" href="#favorites">
+          <span class="nav-icon">⭐</span>
+          <span class="nav-label">Favorites</span>
+        </a>
+        <a class="nav-item" data-page="files" href="#files">
+          <span class="nav-icon">📁</span>
+          <span class="nav-label">File Browser</span>
+        </a>
+        <div class="nav-section-label">System</div>
+        <a class="nav-item" data-page="telegram" href="#telegram">
+          <span class="nav-icon">✈️</span>
+          <span class="nav-label">Telegram</span>
+        </a>
+        <a class="nav-item" data-page="logs" href="#logs">
+          <span class="nav-icon">📄</span>
+          <span class="nav-label">Logs</span>
+        </a>
+        <a class="nav-item" data-page="settings" href="#settings">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-label">Settings</span>
+        </a>
+        <a class="nav-item" data-page="failed" href="#failed" id="nav-failed" style="display:none">
+          <span class="nav-icon">❌</span>
+          <span class="nav-label">Failed Links</span>
+          <span class="nav-badge" id="failed-badge" style="display:none">0</span>
+        </a>
+        <a class="nav-item" data-page="diagnostics" href="#diagnostics">
+          <span class="nav-icon">🔬</span>
+          <span class="nav-label">Diagnostics</span>
+        </a>
+        <a class="nav-item" data-page="about" href="#about">
+          <span class="nav-icon">ℹ️</span>
+          <span class="nav-label">About</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="storage-info" id="storage-info">
+          <div class="storage-label">Storage</div>
+          <div class="storage-bar"><div class="storage-fill" id="storage-fill" style="width:0%"></div></div>
+          <div class="storage-text" id="storage-text">Calculating...</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Main Content Area -->
+    <main class="app-content" id="main-content">
+
+      <!-- ======= HOME PAGE ======= -->
+      <section class="page active" id="page-home">
+        <div class="page-container">
+
+          <!-- Quick Download Card -->
+          <div class="download-card glass-card">
+            <div class="card-header">
+              <span class="card-title">New Download</span>
+              <div class="backend-indicator" id="backend-indicator">
+                <span class="backend-dot"></span>
+                <span class="backend-label" id="backend-label">Connecting...</span>
+              </div>
+            </div>
+
+            <!-- URL Input -->
+            <div class="url-input-wrap">
+              <div class="url-input-icon">🔗</div>
+              <textarea
+                id="url-input"
+                class="url-input"
+                placeholder="Paste URL(s) here — YouTube, TikTok, Instagram, direct links...&#10;Multiple URLs: one per line or comma-separated"
+                rows="3"
+                autocomplete="off"
+                spellcheck="false"
+              ></textarea>
+              <button class="url-paste-btn" id="paste-btn" title="Paste from clipboard">📋</button>
+            </div>
+
+            <!-- Quick Options -->
+            <div class="quick-options">
+              <div class="option-group">
+                <label class="option-label">Quality</label>
+                <select class="option-select" id="quality-select">
+                  <option value="best">🎯 Best</option>
+                  <option value="2160">8K / 4K</option>
+                  <option value="1440">2K / 1440p</option>
+                  <option value="1080">1080p HD</option>
+                  <option value="720">720p HD</option>
+                  <option value="480">480p SD</option>
+                  <option value="360">360p</option>
+                  <option value="mp3">🎵 MP3 Audio</option>
+                  <option value="m4a">🎵 M4A Audio</option>
+                </select>
+              </div>
+              <div class="option-group">
+                <label class="option-label">Format</label>
+                <select class="option-select" id="format-select">
+                  <option value="mp4">MP4</option>
+                  <option value="webm">WebM</option>
+                  <option value="mkv">MKV</option>
+                  <option value="mp3">MP3</option>
+                  <option value="m4a">M4A</option>
+                  <option value="opus">Opus</option>
+                </select>
+              </div>
+              <div class="option-group">
+                <label class="option-label">Mode</label>
+                <select class="option-select" id="mode-select">
+                  <option value="single">Single</option>
+                  <option value="playlist">Playlist</option>
+                  <option value="unlisted_playlist">Unlisted Playlist</option>
+                  <option value="audio_only">Audio Only</option>
+                  <option value="video_only">Video Only</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Toggle Options Row -->
+            <div class="toggle-row">
+              <label class="toggle-chip" title="Embed subtitles">
+                <input type="checkbox" id="opt-subs" />
+                <span>Subtitles</span>
+              </label>
+              <label class="toggle-chip" title="Embed thumbnail">
+                <input type="checkbox" id="opt-thumb" checked />
+                <span>Thumbnail</span>
+              </label>
+              <label class="toggle-chip" title="Embed metadata">
+                <input type="checkbox" id="opt-meta" checked />
+                <span>Metadata</span>
+              </label>
+              <label class="toggle-chip" title="Skip SponsorBlock segments">
+                <input type="checkbox" id="opt-sponsor" />
+                <span>SponsorBlock</span>
+              </label>
+              <label class="toggle-chip" title="Use cookies for private/age-restricted content">
+                <input type="checkbox" id="opt-cookies" />
+                <span>Cookies</span>
+              </label>
+              <label class="toggle-chip" title="Only download latest videos from YouTube channels (since last download)">
+                <input type="checkbox" id="opt-latest-only" />
+                <span>Latest Only</span>
+              </label>
+              <label class="toggle-chip" title="Clean URLs: strip tracking params & resolve short links">
+                <input type="checkbox" id="opt-clean-url" checked />
+                <span>Clean URL</span>
+              </label>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-row">
+              <button class="btn btn-secondary" id="fetch-info-btn">
+                <span class="btn-icon">🔍</span>
+                <span>Fetch Info</span>
+              </button>
+              <button class="btn btn-primary" id="download-btn">
+                <span class="btn-icon">⬇️</span>
+                <span>Download</span>
+              </button>
+            </div>
+
+            <!-- Command Preview -->
+            <div class="cmd-preview" id="cmd-preview" style="display:none">
+              <div class="cmd-preview-header">
+                <span>Generated Command</span>
+                <button class="copy-btn" id="copy-cmd-btn">Copy</button>
+              </div>
+              <pre class="cmd-preview-code" id="cmd-preview-code"></pre>
+            </div>
+          </div>
+
+          <!-- Video Info Card (shown after fetch) -->
+          <div class="video-info-card glass-card" id="video-info-card" style="display:none">
+            <div class="video-info-header">
+              <img class="video-thumb" id="video-thumb" src="" alt="Thumbnail" />
+              <div class="video-meta">
+                <div class="video-title" id="video-title">—</div>
+                <div class="video-uploader" id="video-uploader">—</div>
+                <div class="video-id" id="video-id" style="font-size:.75rem;color:var(--text-muted);margin-top:4px"></div>
+                <div class="video-stats">
+                  <span class="stat-chip" id="video-duration">—</span>
+                  <span class="stat-chip" id="video-resolution">—</span>
+                  <span class="stat-chip" id="video-size">—</span>
+                  <span class="stat-chip" id="video-views">—</span>
+                  <span class="stat-chip" id="video-likes" style="display:none">—</span>
+                  <span class="stat-chip" id="video-upload-date" style="display:none">—</span>
+                  <span class="stat-chip" id="video-channel-id" style="display:none;font-size:.7rem;color:var(--text-muted)">—</span>
+                  <span class="stat-chip" id="video-comments" style="display:none">—</span>
+                </div>
+                <div class="video-channel" id="video-channel" style="font-size:.75rem;color:var(--text-muted);margin-top:4px"></div>
+                <div class="video-description" id="video-description" style="font-size:.75rem;color:var(--text-muted);margin-top:6px;max-height:60px;overflow:hidden;cursor:pointer" title="Click to expand"></div>
+                <div class="video-tags" id="video-tags" style="margin-top:6px"></div>
+              </div>
+            </div>
+            <!-- Format Picker -->
+            <div class="format-picker" id="format-picker"></div>
+            <div class="action-row">
+              <button class="btn btn-primary full-width" id="confirm-download-btn">
+                <span class="btn-icon">⬇️</span>
+                <span>Download Now</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Stats Row -->
+          <div class="stats-row">
+            <div class="stat-card glass-card">
+              <div class="stat-icon">⬇️</div>
+              <div class="stat-value" id="stat-total">0</div>
+              <div class="stat-label">Total Downloads</div>
+            </div>
+            <div class="stat-card glass-card">
+              <div class="stat-icon">▶️</div>
+              <div class="stat-value" id="stat-active">0</div>
+              <div class="stat-label">Active</div>
+            </div>
+            <div class="stat-card glass-card">
+              <div class="stat-icon">💾</div>
+              <div class="stat-value" id="stat-size">0 GB</div>
+              <div class="stat-label">Downloaded</div>
+            </div>
+            <div class="stat-card glass-card">
+              <div class="stat-icon">✅</div>
+              <div class="stat-value" id="stat-done">0</div>
+              <div class="stat-label">Completed</div>
+            </div>
+          </div>
+
+          <!-- Active Jobs Preview -->
+          <div class="section-header">
+            <span class="section-title">Active Downloads</span>
+            <a class="section-action" data-page="active" href="#active">View All</a>
+          </div>
+          <div class="jobs-list" id="home-active-jobs">
+            <div class="empty-state" id="home-empty-state">
+              <div class="empty-icon">📭</div>
+              <div class="empty-title">No active downloads</div>
+              <div class="empty-subtitle">Paste a URL above to get started</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ======= DOWNLOADS PAGE ======= -->
+      <section class="page" id="page-downloads">
+        <div class="page-container">
+          <div class="page-toolbar">
+            <div class="toolbar-search">
+              <span class="search-icon">🔍</span>
+              <input type="text" class="toolbar-input" id="dl-search" placeholder="Search downloads..." />
+            </div>
+            <div class="toolbar-actions">
+              <select class="option-select sm" id="dl-sort">
+                <option value="date_desc">Newest</option>
+                <option value="date_asc">Oldest</option>
+                <option value="name_asc">Name A-Z</option>
+                <option value="size_desc">Largest</option>
+              </select>
+              <select class="option-select sm" id="dl-filter">
+                <option value="all">All</option>
+                <option value="video">Video</option>
+                <option value="audio">Audio</option>
+                <option value="done">Completed</option>
+                <option value="error">Failed</option>
+              </select>
+            </div>
+          </div>
+          <div class="downloads-grid" id="downloads-grid">
+            <div class="empty-state">
+              <div class="empty-icon">📂</div>
+              <div class="empty-title">No downloads yet</div>
+              <div class="empty-subtitle">Your downloads will appear here</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======= ACTIVE JOBS PAGE ======= -->
+      <section class="page" id="page-active">
+        <div class="page-container">
+          <div class="jobs-controls">
+            <button class="btn btn-sm btn-secondary" id="pause-all-btn">⏸ Pause All</button>
+            <button class="btn btn-sm btn-secondary" id="resume-all-btn">▶ Resume All</button>
+            <button class="btn btn-sm btn-danger" id="cancel-all-btn">✕ Cancel All</button>
+          </div>
+          <div class="jobs-list full" id="active-jobs-list">
+            <div class="empty-state">
+              <div class="empty-icon">⏳</div>
+              <div class="empty-title">No active jobs</div>
+              <div class="empty-subtitle">Downloads in progress appear here</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======= BATCH QUEUE PAGE ======= -->
+      <section class="page" id="page-queue">
+        <div class="page-container">
+          <div class="batch-input-card glass-card">
+            <div class="card-header">
+              <span class="card-title">📋 Batch Download Queue</span>
+            </div>
+            <textarea
+              id="batch-urls"
+              class="batch-textarea"
+              placeholder="Paste multiple URLs — one per line, comma-separated, or space-separated&#10;&#10;https://youtube.com/watch?v=...&#10;https://tiktok.com/@user/video/...&#10;https://instagram.com/p/..."
+              rows="8"
+            ></textarea>
+            <div class="batch-options">
+              <div class="option-group">
+                <label class="option-label">Quality for all</label>
+                <select class="option-select" id="batch-quality">
+                  <option value="best">Best</option>
+                  <option value="1080">1080p</option>
+                  <option value="720">720p</option>
+                  <option value="mp3">MP3</option>
+                </select>
+              </div>
+              <div class="option-group">
+                <label class="option-label">Max parallel</label>
+                <select class="option-select" id="batch-parallel">
+                  <option value="1">1 (Sequential)</option>
+                  <option value="2" selected>2</option>
+                  <option value="3">3</option>
+                  <option value="5">5</option>
+                </select>
+              </div>
+            </div>
+            <div class="action-row">
+              <button class="btn btn-secondary" id="parse-batch-btn">Parse URLs</button>
+              <button class="btn btn-primary" id="start-batch-btn">Start All</button>
+            </div>
+          </div>
+          <div class="batch-queue-list" id="batch-queue-list"></div>
+        </div>
+      </section>
+
+      <!-- ======= ARCHIVE PAGE ======= -->
+      <section class="page" id="page-archive">
+        <div class="page-container">
+          <div class="section-header">
+            <span class="section-title">📦 Archive</span>
+            <button class="btn btn-sm btn-secondary" id="clear-archive-btn">Clear Archive</button>
+          </div>
+          <div class="archive-list" id="archive-list">
+            <div class="empty-state">
+              <div class="empty-icon">📦</div>
+              <div class="empty-title">Archive is empty</div>
+              <div class="empty-subtitle">URLs added to archive will appear here</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======= HISTORY PAGE ======= -->
+      <section class="page" id="page-history">
+        <div class="page-container">
+          <div class="page-toolbar">
+            <div class="toolbar-search">
+              <span class="search-icon">🔍</span>
+              <input type="text" class="toolbar-input" id="hist-search" placeholder="Search history..." />
+            </div>
+            <button class="btn btn-sm btn-danger" id="clear-history-btn">Clear History</button>
+          </div>
+          <div class="history-list" id="history-list">
+            <div class="empty-state">
+              <div class="empty-icon">🕒</div>
+              <div class="empty-title">No history yet</div>
+              <div class="empty-subtitle">Completed downloads appear here</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======= FAVORITES PAGE ======= -->
+      <section class="page" id="page-favorites">
+        <div class="page-container">
+          <div class="favorites-list" id="favorites-list">
+            <div class="empty-state">
+              <div class="empty-icon">⭐</div>
+              <div class="empty-title">No favorites yet</div>
+              <div class="empty-subtitle">Star a download to save it here</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======= FILE BROWSER PAGE ======= -->
+      <section class="page" id="page-files">
+        <div class="page-container">
+          <div class="file-browser glass-card">
+            <div class="file-browser-header">
+              <div class="breadcrumb" id="breadcrumb">
+                <span class="breadcrumb-item active">Downloads</span>
+              </div>
+              <div class="file-actions">
+                <button class="icon-btn" id="refresh-files-btn" title="Refresh">🔄</button>
+                <button class="icon-btn" id="open-folder-btn" title="Open folder">📂</button>
+              </div>
+            </div>
+            <div class="file-path-display" id="file-path-display" style="padding:4px 12px 0;font-size:0.75rem;color:var(--text-muted);word-break:break-all"></div>
+            <div class="file-grid" id="file-grid">
+              <div class="empty-state">
+                <div class="empty-icon">📁</div>
+                <div class="empty-title">Loading files...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======= TELEGRAM PAGE ======= -->
+      <section class="page" id="page-telegram">
+        <div class="page-container">
+          <div class="page-toolbar">
+            <span class="section-title" style="font-size:1.2rem">✈️ Telegram Downloader</span>
+            <div id="tg-status" class="tg-status">Loading...</div>
+          </div>
+
+          <!-- Login Step -->
+          <div id="tg-login-step">
+            <div class="tg-card glass-card">
+              <div class="tg-card-icon">✈️</div>
+              <div class="tg-card-title">Telegram Login</div>
+              <div class="tg-card-desc">Enter your Telegram account credentials to browse chats and download media.</div>
+
+              <!-- Phone form -->
+              <div id="tg-form-phone" class="tg-form">
+                <label class="tg-label">Phone Number (international format)</label>
+                <input type="text" id="tg-phone-input" class="setting-input" placeholder="+1234567890" />
+                <button class="btn btn-primary full-width" id="tg-send-code-btn">Send Code</button>
+              </div>
+
+              <!-- Code form -->
+              <div id="tg-form-code" class="tg-form" style="display:none">
+                <label class="tg-label">Verification Code</label>
+                <div id="tg-code-display" class="tg-code-info"></div>
+                <input type="text" id="tg-code-input" class="setting-input" placeholder="12345" inputmode="numeric" />
+                <button class="btn btn-primary full-width" id="tg-verify-btn">Verify</button>
+                <button class="btn btn-sm btn-secondary full-width" id="tg-resend-code-btn" style="display:none;margin-top:8px">🔄 Resend Code</button>
+              </div>
+
+              <!-- 2FA Password form -->
+              <div id="tg-form-password" class="tg-form" style="display:none">
+                <label class="tg-label">2FA Password</label>
+                <div class="tg-code-info">Your account has two-factor authentication enabled.</div>
+                <input type="password" id="tg-password-input" class="setting-input" placeholder="Enter password" />
+                <button class="btn btn-primary full-width" id="tg-password-btn">Sign In</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Logout button -->
+          <div id="tg-logout-wrap" style="display:none;margin-top:12px">
+            <button class="btn btn-sm btn-danger" id="tg-logout-btn">✕ Logout</button>
+          </div>
+
+          <!-- Dialogs Step -->
+          <div id="tg-dialogs-step" style="display:none">
+            <div class="tg-toolbar">
+              <span id="tg-dialog-count" class="tg-count">0 dialogs</span>
+              <div class="tg-search-wrap">
+                <input type="text" id="tg-dialog-search" class="toolbar-input" placeholder="Search dialogs..." />
+                <button class="btn btn-sm btn-secondary" id="tg-refresh-dialogs">🔄 Refresh</button>
+              </div>
+            </div>
+            <div id="tg-dialog-list" class="tg-dialog-list">
+              <div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">No dialogs loaded</div></div>
+            </div>
+          </div>
+
+          <!-- Messages Step -->
+          <div id="tg-messages-step" style="display:none">
+            <div id="tg-msg-header" class="tg-msg-header"></div>
+            <div class="tg-msg-toolbar">
+              <div class="tg-msg-controls">
+                <label class="toggle-chip">
+                  <input type="checkbox" id="tg-msg-media-only" />
+                  <span>Media only</span>
+                </label>
+                <label class="toggle-chip">
+                  <input type="checkbox" id="tg-msg-select-all" />
+                  <span>Select all</span>
+                </label>
+              </div>
+              <span id="tg-msg-count" class="tg-msg-count">0 messages</span>
+            </div>
+            <div class="tg-msg-options">
+              <div class="option-group">
+                <label class="option-label">Download Mode</label>
+                <select class="option-select" id="tg-msg-mode">
+                  <option value="account">Via Account Direct</option>
+                  <option value="bot">Forward to Bot</option>
+                </select>
+              </div>
+              <div class="option-group" id="tg-bot-token-group">
+                <label class="option-label">Bot Token (for bot mode)</label>
+                <input type="text" class="setting-input" id="tg-bot-token" placeholder="123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11" />
+              </div>
+              <div class="option-group">
+                <label class="option-label">Download Folder (optional)</label>
+                <input type="text" class="setting-input" id="tg-dl-folder" placeholder="Leave empty for default" />
+              </div>
+              <div class="option-group">
+                <label class="option-label">Media Type Filters</label>
+                <div class="tg-media-filters">
+                  <label class="toggle-chip"><input type="checkbox" class="tg-media-filter" value="photo" checked /><span>🖼️ Photos</span></label>
+                  <label class="toggle-chip"><input type="checkbox" class="tg-media-filter" value="video" checked /><span>🎬 Videos</span></label>
+                  <label class="toggle-chip"><input type="checkbox" class="tg-media-filter" value="document" checked /><span>📄 Documents</span></label>
+                  <label class="toggle-chip"><input type="checkbox" class="tg-media-filter" value="audio" checked /><span>🎵 Audio</span></label>
+                </div>
+              </div>
+              <div class="option-group" style="display:flex;gap:8px;flex-wrap:wrap">
+                <div>
+                  <label class="option-label">Limit per type</label>
+                  <input type="number" class="setting-input" id="tg-media-limit" value="100" min="1" max="10000" style="width:100px" />
+                </div>
+                <div style="align-self:flex-end">
+                  <button class="btn btn-sm btn-secondary" id="tg-scan-btn">🔍 Scan Media</button>
+                </div>
+              </div>
+              <div id="tg-scan-results" style="display:none;margin-top:8px"></div>
+            </div>
+            <button class="btn btn-primary full-width" id="tg-msg-download-btn" disabled>⬇️ Download</button>
+            <div id="tg-msg-list" class="tg-msg-list">
+              <div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">No messages loaded</div></div>
+            </div>
+          </div>
+
+          <!-- Bot Pool Manager -->
+          <div class="glass-card" style="margin-top:16px">
+            <details>
+              <summary style="cursor:pointer;font-weight:600;padding:8px 0">🤖 Bot Pool Manager</summary>
+              <div style="margin-top:8px">
+                <div class="option-group">
+                  <label class="option-label">Add Bot Token</label>
+                  <div class="input-with-btn">
+                    <input type="text" class="setting-input" id="tg-bot-pool-input" placeholder="123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11" />
+                    <button class="btn btn-sm btn-primary" id="tg-bot-pool-add-btn">Add</button>
+                  </div>
+                </div>
+                <div id="tg-bot-pool-list" style="margin-top:8px">
+                  <div class="empty-state sm"><div class="empty-subtitle">No bots in pool. Add one above.</div></div>
+                </div>
+                <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+                  <button class="btn btn-sm btn-secondary" id="tg-bot-pool-refresh-btn">🔄 Refresh Status</button>
+                  <span id="tg-bot-pool-status" style="font-size:0.8rem;color:var(--text-muted);align-self:center"></span>
+                  <button class="btn btn-sm btn-secondary" id="tg-bot-scores-btn" style="margin-left:auto">📊 Bot Scores</button>
+                </div>
+                <div id="tg-bot-scores" style="display:none;margin-top:8px"></div>
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======= FAILED LINKS PAGE ======= -->
+      <section class="page" id="page-failed">
+        <div class="page-container">
+          <div class="section-header">
+            <span class="section-title">❌ Failed Links</span>
+            <div class="toolbar-actions">
+              <button class="btn btn-sm btn-danger" id="clear-failed-btn">Clear All</button>
+              <button class="btn btn-sm btn-secondary" id="retry-failed-btn">🔄 Retry All</button>
+            </div>
+          </div>
+          <div id="failed-links-container">
+            <div class="failed-empty-state">
+              <div class="empty-icon">✅</div>
+              <div class="empty-title">No failed links</div>
+              <div class="empty-subtitle">All downloads completed successfully</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======= LOGS PAGE ======= -->
+      <section class="page" id="page-logs">
+        <div class="page-container">
+          <div class="logs-card glass-card">
+            <div class="logs-header">
+              <span class="card-title">📄 System Logs</span>
+              <div class="logs-actions">
+                <select class="option-select sm" id="log-level-filter">
+                  <option value="all">All Levels</option>
+                  <option value="info">Info</option>
+                  <option value="warning">Warning</option>
+                  <option value="error">Error</option>
+                  <option value="debug">Debug</option>
+                </select>
+                <button class="btn btn-sm btn-secondary" id="export-logs-btn">Export</button>
+                <button class="btn btn-sm btn-danger" id="clear-logs-btn">Clear</button>
+                <label class="toggle-chip">
+                  <input type="checkbox" id="logs-autoscroll" checked />
+                  <span>Auto-scroll</span>
+                </label>
+              </div>
+            </div>
+            <div class="logs-viewer" id="logs-viewer">
+              <div class="log-entry info">
+                <span class="log-time">--:--:--</span>
+                <span class="log-level info">INFO</span>
+                <span class="log-msg">MegaDL initializing...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======= SETTINGS PAGE ======= -->
+      <section class="page" id="page-settings">
+        <div class="page-container">
+          <div class="settings-tabs">
+            <button class="settings-tab active" data-tab="general">General</button>
+            <button class="settings-tab" data-tab="network">Network</button>
+            <button class="settings-tab" data-tab="media">Media</button>
+            <button class="settings-tab" data-tab="integrations">Integrations</button>
+            <button class="settings-tab" data-tab="advanced">Advanced</button>
+          </div>
+
+          <!-- General Settings -->
+          <div class="settings-panel active" id="settings-general">
+              <div class="settings-group glass-card">
+                <div class="settings-group-title">Download</div>
+                <div class="setting-item">
+                  <div class="setting-info">
+                    <div class="setting-name">Download Folder</div>
+                    <div class="setting-desc">Where to save downloaded files</div>
+                  </div>
+                </div>
+                <div class="setting-item" style="flex-wrap:wrap;gap:8px">
+                  <input type="text" class="setting-input" id="s-dl-folder" placeholder="/sdcard/Download" style="flex:1;min-width:200px" />
+                  <button class="btn btn-sm btn-secondary" id="test-dl-folder-btn">🔍 Test</button>
+                  <button class="btn btn-sm btn-primary" id="save-dl-folder-btn">💾 Save Path</button>
+                  <div id="dl-folder-status" style="font-size:0.8rem;color:var(--text-muted);width:100%"></div>
+                </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Default Quality</div>
+                  <div class="setting-desc">Preferred video quality</div>
+                </div>
+                <select class="option-select" id="s-def-quality">
+                  <option value="best">Best Available</option>
+                  <option value="1080">1080p</option>
+                  <option value="720">720p</option>
+                  <option value="480">480p</option>
+                </select>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Auto Retry on Failure</div>
+                  <div class="setting-desc">Automatically retry failed downloads</div>
+                </div>
+                <label class="android-toggle">
+                  <input type="checkbox" id="s-auto-retry" checked />
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Auto Resume</div>
+                  <div class="setting-desc">Resume interrupted downloads on startup</div>
+                </div>
+                <label class="android-toggle">
+                  <input type="checkbox" id="s-auto-resume" checked />
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="settings-group glass-card">
+              <div class="settings-group-title">Appearance</div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Theme</div>
+                  <div class="setting-desc">App color scheme</div>
+                </div>
+                <select class="option-select" id="s-theme">
+                  <option value="dark">AMOLED Dark</option>
+                  <option value="dark-indigo">Dark Indigo</option>
+                  <option value="dark-purple">Dark Purple</option>
+                  <option value="dark-cyan">Dark Cyan</option>
+                  <option value="dark-emerald">Dark Emerald</option>
+                  <option value="dark-amber">Dark Amber</option>
+                  <option value="dark-red">Dark Red</option>
+                  <option value="amoled-black">True Black</option>
+                  <option value="dracula">Dracula</option>
+                  <option value="nord">Nord</option>
+                  <option value="tokyo-night">Tokyo Night</option>
+                  <option value="light">Light</option>
+                </select>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Accent Color</div>
+                  <div class="setting-desc">Primary action color</div>
+                </div>
+                <div class="accent-picker" id="accent-picker">
+                  <div class="accent-dot" data-color="#6c63ff" style="background:#6c63ff" title="Indigo"></div>
+                  <div class="accent-dot" data-color="#a855f7" style="background:#a855f7" title="Purple"></div>
+                  <div class="accent-dot" data-color="#06b6d4" style="background:#06b6d4" title="Cyan"></div>
+                  <div class="accent-dot" data-color="#10b981" style="background:#10b981" title="Emerald"></div>
+                  <div class="accent-dot" data-color="#f59e0b" style="background:#f59e0b" title="Amber"></div>
+                  <div class="accent-dot" data-color="#ef4444" style="background:#ef4444" title="Red"></div>
+                  <div class="accent-dot" data-color="#ff79c6" style="background:#ff79c6" title="Pink"></div>
+                </div>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Blur Intensity</div>
+                  <div class="setting-desc">Glass card blur strength</div>
+                </div>
+                <div class="range-wrap">
+                  <input type="range" id="s-blur-intensity" min="0" max="40" value="16" class="range-slider" />
+                  <span class="range-value" id="blur-value">16px</span>
+                </div>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Dynamic Background</div>
+                  <div class="setting-desc">Subtle animated ambient gradient</div>
+                </div>
+                <label class="android-toggle">
+                  <input type="checkbox" id="s-dynamic-bg" checked />
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Glass Effect</div>
+                  <div class="setting-desc">Frosted glass card appearance</div>
+                </div>
+                <label class="android-toggle">
+                  <input type="checkbox" id="s-glass-effect" checked />
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Haptic Feedback</div>
+                  <div class="setting-desc">Vibrate on actions (mobile)</div>
+                </div>
+                <label class="android-toggle">
+                  <input type="checkbox" id="s-haptic" checked />
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Network Settings -->
+          <div class="settings-panel" id="settings-network">
+            <div class="settings-group glass-card">
+              <div class="settings-group-title">Connection</div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Speed Limit</div>
+                  <div class="setting-desc">Max download speed (0 = unlimited)</div>
+                </div>
+                <div class="input-with-unit">
+                  <input type="number" class="setting-input sm" id="s-speed-limit" value="0" min="0" />
+                  <span class="input-unit">KB/s</span>
+                </div>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Socket Timeout</div>
+                  <div class="setting-desc">Connection timeout in seconds</div>
+                </div>
+                <input type="number" class="setting-input sm" id="s-timeout" value="30" min="5" max="300" />
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Max Retries</div>
+                  <div class="setting-desc">Number of retry attempts</div>
+                </div>
+                <input type="number" class="setting-input sm" id="s-retries" value="3" min="0" max="20" />
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Proxy</div>
+                  <div class="setting-desc">HTTP/SOCKS proxy URL</div>
+                </div>
+                <input type="text" class="setting-input" id="s-proxy" placeholder="http://proxy:port" />
+              </div>
+            </div>
+            <div class="settings-group glass-card">
+              <div class="settings-group-title">Concurrent Downloads</div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Max Parallel Downloads</div>
+                  <div class="setting-desc">How many downloads run simultaneously</div>
+                </div>
+                <input type="number" class="setting-input sm" id="s-max-dl" value="3" min="1" max="10" />
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Concurrent Fragments</div>
+                  <div class="setting-desc">Parallel fragment downloads per job</div>
+                </div>
+                <input type="number" class="setting-input sm" id="s-frag-concurrent" value="4" min="1" max="16" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Media Settings -->
+          <div class="settings-panel" id="settings-media">
+            <div class="settings-group glass-card">
+              <div class="settings-group-title">Post-Processing</div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Merge Format</div>
+                  <div class="setting-desc">Output container format</div>
+                </div>
+                <select class="option-select" id="s-merge-format">
+                  <option value="mp4">MP4</option>
+                  <option value="mkv">MKV</option>
+                  <option value="webm">WebM</option>
+                </select>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Embed Subtitles</div>
+                  <div class="setting-desc">Auto-embed subtitles when available</div>
+                </div>
+                <label class="android-toggle">
+                  <input type="checkbox" id="s-embed-subs" />
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Subtitle Language</div>
+                  <div class="setting-desc">Preferred subtitle language code</div>
+                </div>
+                <input type="text" class="setting-input sm" id="s-sub-lang" value="en" placeholder="en" />
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Embed Thumbnail</div>
+                  <div class="setting-desc">Add thumbnail to audio files</div>
+                </div>
+                <label class="android-toggle">
+                  <input type="checkbox" id="s-embed-thumb" checked />
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Embed Metadata</div>
+                  <div class="setting-desc">Add video metadata to files</div>
+                </div>
+                <label class="android-toggle">
+                  <input type="checkbox" id="s-embed-meta" checked />
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">SponsorBlock</div>
+                  <div class="setting-desc">Remove sponsored segments from YouTube</div>
+                </div>
+                <label class="android-toggle">
+                  <input type="checkbox" id="s-sponsorblock" />
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Integrations Settings -->
+          <div class="settings-panel" id="settings-integrations">
+            <div class="settings-group glass-card">
+              <div class="settings-group-title">YouTube Data API</div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">YouTube API Key</div>
+                  <div class="setting-desc">Required for channel/playlist metadata. Get one at <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener">Google Cloud Console</a></div>
+                </div>
+                <div class="input-with-btn">
+                  <input type="text" class="setting-input" id="s-youtube-api-key" placeholder="AIzaSy..." />
+                  <button class="btn btn-sm btn-secondary" id="validate-youtube-key-btn">Validate</button>
+                </div>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">YouTube API Status</div>
+                  <div class="setting-desc" id="youtube-key-status">Not validated</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-group glass-card">
+              <div class="settings-group-title">Universal API Keys</div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Service Provider</div>
+                  <div class="setting-desc">Select a platform to configure its API key</div>
+                </div>
+                <select class="option-select" id="api-provider-select">
+                  <option value="">— Select —</option>
+                  <option value="openai">OpenAI (ChatGPT, Whisper)</option>
+                  <option value="anthropic">Anthropic (Claude)</option>
+                  <option value="google_gemini">Google Gemini</option>
+                  <option value="deepseek">DeepSeek</option>
+                  <option value="stability">Stability AI</option>
+                  <option value="huggingface">HuggingFace</option>
+                  <option value="cohere">Cohere</option>
+                  <option value="elevenlabs">ElevenLabs</option>
+                  <option value="assemblyai">AssemblyAI</option>
+                </select>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">API Key</div>
+                  <div class="setting-desc" id="api-key-desc">Paste your API key for the selected service</div>
+                </div>
+                <div class="input-with-btn">
+                  <input type="password" class="setting-input" id="s-api-key-input" placeholder="sk-..." />
+                  <button class="btn btn-sm btn-secondary" id="validate-api-key-btn">Validate</button>
+                </div>
+              </div>
+              <div class="setting-item">
+                <div id="api-key-status" style="font-size:0.8rem;color:var(--text-muted)">No key configured</div>
+              </div>
+            </div>
+
+            <div class="settings-group glass-card">
+              <div class="settings-group-title">Telegram API</div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">API ID</div>
+                  <div class="setting-desc">From <a href="https://my.telegram.org/apps" target="_blank" rel="noopener">my.telegram.org</a></div>
+                </div>
+                <input type="text" class="setting-input" id="s-telegram-api-id" placeholder="1234567" />
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">API Hash</div>
+                  <div class="setting-desc">From my.telegram.org/apps</div>
+                </div>
+                <input type="text" class="setting-input" id="s-telegram-api-hash" placeholder="a1b2c3d4..." />
+              </div>
+              <div class="setting-item" style="gap:8px;flex-wrap:wrap">
+                <div id="tg-api-status" style="font-size:0.8rem;color:var(--text-muted);flex:1">Not validated</div>
+                <button class="btn btn-sm btn-secondary" id="validate-tg-api-btn">🔍 Validate</button>
+                <button class="btn btn-sm btn-primary" id="save-tg-api-btn">💾 Save</button>
+              </div>
+            </div>
+
+            <div class="settings-group glass-card">
+              <div class="settings-group-title">Dependencies</div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">System Dependencies</div>
+                  <div class="setting-desc">Check status and install required packages</div>
+                </div>
+                <button class="btn btn-sm btn-secondary" id="check-deps-btn">🔬 Check All</button>
+              </div>
+              <div id="deps-list" class="deps-list">
+                <div class="empty-state sm"><div class="empty-subtitle">Click "Check All" to scan dependencies</div></div>
+              </div>
+            </div>
+
+            <div class="settings-group glass-card">
+              <div class="settings-group-title">yt-dlp Update</div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Current Version</div>
+                  <div class="setting-desc" id="ytdlp-current-version">Checking...</div>
+                </div>
+              </div>
+              <div class="setting-item" style="gap:8px;flex-wrap:wrap">
+                <div id="ytdlp-update-status" style="font-size:0.8rem;color:var(--text-muted);flex:1"></div>
+                <button class="btn btn-sm btn-secondary" id="check-ytdlp-update-btn">🔍 Check Update</button>
+                <button class="btn btn-sm btn-primary" id="update-ytdlp-btn">⬇ Update Now</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Advanced Settings -->
+          <div class="settings-panel" id="settings-advanced">
+            <div class="settings-group glass-card">
+              <div class="settings-group-title">yt-dlp Advanced</div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Custom yt-dlp Arguments</div>
+                  <div class="setting-desc">Extra args appended to every command</div>
+                </div>
+                <input type="text" class="setting-input" id="s-custom-args" placeholder="--no-check-certificate" />
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Verbose Logging</div>
+                  <div class="setting-desc">Enable verbose yt-dlp output</div>
+                </div>
+                <label class="android-toggle">
+                  <input type="checkbox" id="s-verbose" />
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Archive Downloads</div>
+                  <div class="setting-desc">Track downloaded IDs to avoid re-downloading</div>
+                </div>
+                <label class="android-toggle">
+                  <input type="checkbox" id="s-archive" checked />
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                </label>
+              </div>
+            </div>
+            <div class="settings-group glass-card">
+              <div class="settings-group-title">Debug</div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <div class="setting-name">Debug Mode</div>
+                  <div class="setting-desc">Show additional debug information</div>
+                </div>
+                <label class="android-toggle">
+                  <input type="checkbox" id="s-debug" />
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                </label>
+              </div>
+            </div>
+            <div class="action-row">
+              <button class="btn btn-secondary" id="save-settings-btn">💾 Save Settings</button>
+              <button class="btn btn-danger" id="reset-settings-btn">Reset Defaults</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======= DIAGNOSTICS PAGE ======= -->
+      <section class="page" id="page-diagnostics">
+        <div class="page-container">
+          <div class="diag-card glass-card">
+            <div class="card-header">
+              <span class="card-title">🔬 System Diagnostics</span>
+              <button class="btn btn-sm btn-primary" id="run-diag-btn">Run Check</button>
+            </div>
+            <div class="diag-grid" id="diag-grid">
+              <div class="diag-item" id="diag-python">
+                <div class="diag-icon">🐍</div>
+                <div class="diag-info">
+                  <div class="diag-name">Python</div>
+                  <div class="diag-value">Checking...</div>
+                </div>
+                <div class="diag-status">⏳</div>
+              </div>
+              <div class="diag-item" id="diag-ytdlp">
+                <div class="diag-icon">📥</div>
+                <div class="diag-info">
+                  <div class="diag-name">yt-dlp</div>
+                  <div class="diag-value">Checking...</div>
+                </div>
+                <div class="diag-status">⏳</div>
+              </div>
+              <div class="diag-item" id="diag-ffmpeg">
+                <div class="diag-icon">🎬</div>
+                <div class="diag-info">
+                  <div class="diag-name">FFmpeg</div>
+                  <div class="diag-value">Checking...</div>
+                </div>
+                <div class="diag-status">⏳</div>
+              </div>
+              <div class="diag-item" id="diag-php">
+                <div class="diag-icon">🐘</div>
+                <div class="diag-info">
+                  <div class="diag-name">PHP</div>
+                  <div class="diag-value">Checking...</div>
+                </div>
+                <div class="diag-status">⏳</div>
+              </div>
+              <div class="diag-item" id="diag-backend">
+                <div class="diag-icon">⚡</div>
+                <div class="diag-info">
+                  <div class="diag-name">Active Backend</div>
+                  <div class="diag-value">Detecting...</div>
+                </div>
+                <div class="diag-status">⏳</div>
+              </div>
+              <div class="diag-item" id="diag-storage">
+                <div class="diag-icon">💾</div>
+                <div class="diag-info">
+                  <div class="diag-name">Storage</div>
+                  <div class="diag-value">Checking...</div>
+                </div>
+                <div class="diag-status">⏳</div>
+              </div>
+              <div class="diag-item" id="diag-perms">
+                <div class="diag-icon">🔐</div>
+                <div class="diag-info">
+                  <div class="diag-name">Write Permissions</div>
+                  <div class="diag-value">Checking...</div>
+                </div>
+                <div class="diag-status">⏳</div>
+              </div>
+              <div class="diag-item" id="diag-network">
+                <div class="diag-icon">🌐</div>
+                <div class="diag-info">
+                  <div class="diag-name">Network</div>
+                  <div class="diag-value">Checking...</div>
+                </div>
+                <div class="diag-status">⏳</div>
+              </div>
+            </div>
+          </div>
+          <div class="diag-logs glass-card">
+            <div class="card-header"><span class="card-title">Diagnostic Output</span></div>
+            <pre class="diag-output" id="diag-output">Run diagnostics to see output...</pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======= ABOUT PAGE ======= -->
+      <section class="page" id="page-about">
+        <div class="page-container">
+          <div class="about-card glass-card">
+            <div class="about-hero">
+              <div class="about-logo">
+                <svg width="80" height="80" viewBox="0 0 64 64" fill="none">
+                  <circle cx="32" cy="32" r="32" fill="url(#aboutGrad)"/>
+                  <path d="M32 14 L32 38 M22 28 L32 40 L42 28" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <rect x="16" y="44" width="32" height="4" rx="2" fill="white" opacity="0.8"/>
+                  <defs>
+                    <linearGradient id="aboutGrad" x1="0" y1="0" x2="64" y2="64">
+                      <stop offset="0%" stop-color="#6c63ff"/>
+                      <stop offset="100%" stop-color="#a855f7"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <div class="about-app-name">MegaDL</div>
+              <div class="about-version" id="about-version">v2.0.0</div>
+              <div class="about-tagline">Professional Download Manager</div>
+            </div>
+            <div class="about-info">
+              <div class="about-row">
+                <span class="about-label">Engine</span>
+                <span class="about-value">yt-dlp + FFmpeg</span>
+              </div>
+              <div class="about-row">
+                <span class="about-label">Backend</span>
+                <span class="about-value" id="about-backend">Detecting...</span>
+              </div>
+              <div class="about-row">
+                <span class="about-label">Platform</span>
+                <span class="about-value" id="about-platform">Web PWA</span>
+              </div>
+              <div class="about-row">
+                <span class="about-label">License</span>
+                <span class="about-value">MIT Open Source</span>
+              </div>
+            </div>
+            <div class="about-footer" style="margin-top:16px;padding:14px 16px;text-align:center;border-top:1px solid var(--glass-border);font-size:0.8rem;color:var(--text-muted)">
+              made with 💖 by ahmed awad
+            </div>
+            <div class="about-features">
+              <div class="feature-chip">🎯 1000+ Sites</div>
+              <div class="feature-chip">📱 Android PWA</div>
+              <div class="feature-chip">⚡ Fast Engine</div>
+              <div class="feature-chip">🔒 Secure</div>
+              <div class="feature-chip">🎵 Audio Extraction</div>
+              <div class="feature-chip">📋 Batch Download</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main><!-- /main-content -->
+
+    <!-- ======= BOTTOM NAVIGATION (Mobile) ======= -->
+    <nav class="bottom-nav" id="bottom-nav">
+      <a class="bottom-nav-item active" data-page="home" href="#home">
+        <span class="bnav-icon">🏠</span>
+        <span class="bnav-label">Home</span>
+      </a>
+      <a class="bottom-nav-item" data-page="active" href="#active">
+        <span class="bnav-icon">▶️</span>
+        <span class="bnav-label">Active</span>
+        <span class="bnav-badge" id="bnav-active-badge" style="display:none">0</span>
+      </a>
+      <a class="bottom-nav-item fab-trigger" data-page="home" href="#home" id="fab-center">
+        <div class="fab-btn">
+          <span>⬇️</span>
+        </div>
+      </a>
+      <a class="bottom-nav-item" data-page="telegram" href="#telegram">
+        <span class="bnav-icon">✈️</span>
+        <span class="bnav-label">Telegram</span>
+      </a>
+      <a class="bottom-nav-item" data-page="downloads" href="#downloads">
+        <span class="bnav-icon">📂</span>
+        <span class="bnav-label">Files</span>
+      </a>
+      <a class="bottom-nav-item" data-page="settings" href="#settings">
+        <span class="bnav-icon">⚙️</span>
+        <span class="bnav-label">Settings</span>
+      </a>
+    </nav>
+
+    <!-- ======= FAB (Desktop) ======= -->
+    <button class="fab desktop-fab" id="desktop-fab" title="New Download (N)">
+      <span>⬇️</span>
+    </button>
+
+  </div><!-- /app -->
+
+  <!-- ======= MODALS ======= -->
+
+  <!-- Job Detail Modal -->
+  <div class="modal-backdrop" id="modal-job-detail" style="display:none">
+    <div class="modal glass-card">
+      <div class="modal-header">
+        <span class="modal-title" id="modal-job-title">Download Details</span>
+        <button class="modal-close" data-modal="modal-job-detail">✕</button>
+      </div>
+      <div class="modal-body" id="modal-job-body"></div>
+    </div>
+  </div>
+
+  <!-- URL Paste Dialog -->
+  <div class="modal-backdrop" id="modal-paste" style="display:none">
+    <div class="modal glass-card">
+      <div class="modal-header">
+        <span class="modal-title">Quick Paste</span>
+        <button class="modal-close" data-modal="modal-paste">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-message">Paste a URL to download:</div>
+        <input type="text" class="setting-input" id="quick-paste-input" placeholder="https://..." style="margin-top:12px" />
+        <div class="action-row" style="margin-top:16px">
+          <button class="btn btn-secondary" data-modal="modal-paste">Cancel</button>
+          <button class="btn btn-primary" id="quick-paste-go">Download</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Dialog -->
+  <div class="modal-backdrop" id="modal-confirm" style="display:none">
+    <div class="modal glass-card sm">
+      <div class="modal-header">
+        <span class="modal-title" id="confirm-title">Confirm</span>
+      </div>
+      <div class="modal-body">
+        <div class="modal-message" id="confirm-message"></div>
+        <div class="action-row" style="margin-top:16px">
+          <button class="btn btn-secondary" id="confirm-cancel-btn">Cancel</button>
+          <button class="btn btn-danger" id="confirm-ok-btn">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Search Overlay -->
+  <div class="search-overlay" id="search-overlay" style="display:none">
+    <div class="search-overlay-inner">
+      <div class="search-bar-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="search-overlay-input" id="global-search" placeholder="Search downloads, history..." autofocus />
+        <button class="icon-btn" id="close-search-btn">✕</button>
+      </div>
+      <div class="search-results" id="search-results">
+        <div class="empty-state">
+          <div class="empty-subtitle">Start typing to search...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Install PWA Banner -->
+  <div class="pwa-banner" id="pwa-banner" style="display:none">
+    <div class="pwa-banner-content">
+      <span class="pwa-icon">📱</span>
+      <div class="pwa-text">
+        <div class="pwa-title">Install MegaDL</div>
+        <div class="pwa-subtitle">Add to home screen for offline access</div>
+      </div>
+    </div>
+    <div class="pwa-actions">
+      <button class="btn btn-sm btn-secondary" id="pwa-dismiss">Later</button>
+      <button class="btn btn-sm btn-primary" id="pwa-install">Install</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/router.js"></script>
+  <script src="assets/js/jobs.js"></script>
+  <script src="assets/js/downloader.js"></script>
+  <script src="assets/js/settings.js"></script>
+  <script src="assets/js/files.js"></script>
+  <script src="assets/js/logs.js"></script>
+  <script src="assets/js/telegram.js"></script>
+  <script src="assets/js/diagnostics.js"></script>
+  <script src="assets/js/search.js"></script>
+  <script src="assets/js/pwa.js"></script>
+  <script src="assets/js/app.js"></script>
+
+  <!-- Service Worker registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js').catch(e => console.warn('SW:', e));
+      });
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,229 @@
+/* ============================================================
+   MegaDL — Pages CSS
+   Per-page specific styles and overrides
+   ============================================================ */
+
+/* ─── Home page adjustments ──────────────────────────────────── */
+
+#page-home .download-card {
+  background: linear-gradient(
+    145deg,
+    rgba(108, 99, 255, 0.08),
+    rgba(12, 10, 30, 0.72)
+  );
+  border-color: rgba(108, 99, 255, 0.2);
+}
+
+/* ─── Active Jobs page ───────────────────────────────────────── */
+
+#page-active .jobs-list.full {
+  padding-bottom: 80px;
+}
+
+/* ─── Downloads page ─────────────────────────────────────────── */
+
+#page-downloads .downloads-grid {
+  padding-bottom: 80px;
+}
+
+/* ─── Settings sub-panels ────────────────────────────────────── */
+
+#settings-advanced .code-block {
+  margin-top: 8px;
+  font-size: 0.72rem;
+}
+
+/* ─── Logs page ──────────────────────────────────────────────── */
+
+#page-logs .logs-viewer {
+  height: calc(100dvh - 280px);
+}
+
+/* ─── Diagnostics result colors ──────────────────────────────── */
+
+.diag-item.ok    { border-color: rgba(34,197,94,0.25); }
+.diag-item.warn  { border-color: rgba(245,158,11,0.25); }
+.diag-item.fail  { border-color: rgba(239,68,68,0.25); }
+
+.diag-item.ok .diag-status    { color: var(--success); }
+.diag-item.warn .diag-status  { color: var(--warning); }
+.diag-item.fail .diag-status  { color: var(--error); }
+
+/* ─── File Browser ───────────────────────────────────────────── */
+
+#page-files .file-browser {
+  max-height: calc(100dvh - 160px);
+}
+
+.file-grid.list-view {
+  grid-template-columns: 1fr;
+}
+
+.file-grid.list-view .file-item {
+  flex-direction: row;
+  text-align: left;
+  padding: 10px 12px;
+}
+
+.file-grid.list-view .file-icon { font-size: 1.4rem; }
+.file-grid.list-view .file-name { flex: 1; }
+
+/* ─── Batch Queue ─────────────────────────────────────────────── */
+
+.batch-item.queued   { border-left: 3px solid var(--text-muted); }
+.batch-item.running  { border-left: 3px solid var(--accent); }
+.batch-item.done     { border-left: 3px solid var(--success); }
+.batch-item.error    { border-left: 3px solid var(--error); }
+
+/* ─── History item ────────────────────────────────────────────── */
+
+.history-item .history-re-dl {
+  font-size: 0.75rem;
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* ─── Archive item ─────────────────────────────────────────────── */
+
+.archive-item .archive-id {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  word-break: break-all;
+}
+
+/* ─── About page gradient background ─────────────────────────── */
+
+#page-about .about-card {
+  background: linear-gradient(
+    145deg,
+    rgba(108, 99, 255, 0.06),
+    rgba(168, 85, 247, 0.03),
+    rgba(12, 10, 30, 0.72)
+  );
+}
+
+/* ─── Quick paste modal large input ─────────────────────────── */
+
+#quick-paste-input {
+  width: 100%;
+  padding: 12px;
+  font-size: 0.9rem;
+}
+
+/* ─── Job Detail Modal ───────────────────────────────────────── */
+
+.job-detail-section {
+  margin-bottom: 16px;
+}
+
+.job-detail-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.job-detail-log {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius-sm);
+  padding: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  max-height: 160px;
+  overflow-y: auto;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* ─── Setup wizard styles ─────────────────────────────────────── */
+
+.setup-step {
+  display: none;
+  animation: fadeIn var(--dur-normal) var(--transition);
+}
+
+.setup-step.active { display: block; }
+
+.setup-progress-bar {
+  height: 4px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.setup-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  border-radius: 4px;
+  transition: width 0.5s var(--transition);
+}
+
+/* ─── Notification badge pulse ────────────────────────────────── */
+
+@keyframes badgePulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.2); }
+}
+
+.notif-badge.has-notifs {
+  animation: badgePulse 2s infinite;
+}
+
+/* ─── Responsive overrides for pages ─────────────────────────── */
+
+@media (max-width: 600px) {
+  #page-logs .logs-viewer {
+    height: calc(100dvh - 320px);
+  }
+
+  .diag-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .settings-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .settings-tab {
+    white-space: nowrap;
+    font-size: 0.75rem;
+    padding: 8px 10px;
+  }
+}
+
+@media (min-width: 768px) {
+  #page-home .download-card {
+    padding: 28px;
+  }
+
+  .video-info-header {
+    flex-direction: row;
+  }
+
+  .video-thumb {
+    width: 180px;
+    height: 100px;
+  }
+
+  .stats-row {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  #page-logs .logs-viewer {
+    height: calc(100dvh - 220px);
+  }
+
+  .diag-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
