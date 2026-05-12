@@ -22,7 +22,7 @@ from typing import Optional, Callable
 
 logger = logging.getLogger('megadl.ytdlp')
 
-DOWNLOAD_DIR = "/sdcard/Download/MegaDL"
+DOWNLOAD_DIR = "/storage/emulated/0/Download/AW/AW-DL"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 
@@ -388,14 +388,28 @@ class YtdlpService:
     def _resolve_output_path(self, dl_folder: str, url: str, opts: dict) -> Optional[str]:
         """
         Use yt-dlp --print filename_after_merge to get the exact final path
-        WITHOUT actually downloading. This works because yt-dlp computes
-        the output path based on the template and metadata.
+        WITHOUT actually downloading. Uses smart output path when info is available.
         """
         ytdlp = self.find_binary('yt-dlp')
         if not ytdlp:
             return None
 
-        template = self._build_output_template(dl_folder, opts)
+        # Build the output path template with smart folder structure
+        info = {}
+        try:
+            info_cmd = [
+                ytdlp, '--dump-json', '--no-playlist',
+                '--no-warnings', '--skip-download', url,
+                '--socket-timeout', '15',
+            ]
+            ir = subprocess.run(info_cmd, capture_output=True, text=True,
+                                encoding='utf-8', errors='replace', timeout=30)
+            if ir.returncode == 0 and ir.stdout.strip():
+                info = json.loads(ir.stdout.strip().split('\n')[0])
+        except Exception:
+            pass
+
+        template = self._build_output_path(dl_folder, url, info, opts)
         cmd = [
             ytdlp,
             '--print', 'filename_after_merge',
@@ -441,12 +455,26 @@ class YtdlpService:
         return "other"
 
     def _build_output_path(self, dl_folder: str, url: str, info: dict, opts: dict) -> str:
-        """Build smart output path with platform-specific folders."""
+        """
+        Build smart output path with organized folder structure:
+          {dl_folder}/ChannelName/Playlists/PlaylistName/Title [id].ext
+          {dl_folder}/ChannelName/Uploads/Title [id].ext
+          {dl_folder}/ChannelName/Uncategorized/Title [id].ext
+          {dl_folder}/ChannelName/Latest/Title [id].ext
+          {dl_folder}/Playlist_PLxxxx/Title [id].ext
+          {dl_folder}/domain.com/Title [id].ext
+        """
         out_dir = Path(dl_folder)
         platform = self._detect_platform(url)
-        uploader = (info.get("uploader") or info.get("channel") or "unknown").strip()
-        uploader_safe = re.sub(r'[\\/:*?"<>|]', '_', uploader)[:100]
-        is_playlist = bool(info.get("playlist_id")) or opts.get('mode') == 'playlist'
+
+        # Common fields
+        uploader = (info.get("uploader") or info.get("channel") or "").strip()
+        uploader_safe = re.sub(r'[\\/:*?"<>|]', '_', uploader)[:100] if uploader else ""
+        playlist_id = info.get("playlist_id") or ""
+        playlist_title = info.get("playlist_title") or ""
+        playlist_title_safe = re.sub(r'[\\/:*?"<>|]', '_', playlist_title)[:100] if playlist_title else ""
+        is_playlist = bool(playlist_id) or opts.get('mode') in ('playlist', 'unlisted_playlist')
+        mode = opts.get('mode', 'single')
 
         quality = opts.get('quality', self.settings.get('def_quality', 'best'))
         if quality in ('mp3', 'm4a'):
@@ -454,21 +482,86 @@ class YtdlpService:
         else:
             ext = '%(ext)s'
 
+        # Always use %(id)s placeholder so yt-dlp substitutes per video
+        filename_tpl = f"%(title)s [%(id)s].{ext}"
+
         if platform == "facebook":
-            return str(out_dir / "facebook.com" / uploader_safe / f"%(title)s.{ext}")
+            return str(out_dir / "facebook.com" / filename_tpl)
 
         if platform == "youtube":
-            playlist = info.get("playlist_title")
-            channel_safe = uploader_safe
-            if is_playlist and playlist:
-                pl_safe = re.sub(r'[\\/:*?"<>|]', '_', playlist)[:100]
-                return str(out_dir / channel_safe / pl_safe / f"%(title)s.{ext}")
-            return str(out_dir / channel_safe / f"%(title)s.{ext}")
+            channel_safe = uploader_safe or "Unknown_Channel"
 
-        return str(out_dir / platform / uploader_safe / f"%(title)s.{ext}")
+            # Standalone playlist (no channel context) → Playlist_PLxxxx/
+            if is_playlist and not uploader_safe:
+                pl_dir = f"Playlist_{playlist_id}" if playlist_id else "Playlist_unknown"
+                return str(out_dir / pl_dir / filename_tpl)
+
+            # Playlist within a channel → ChannelName/Playlists/PlaylistName/
+            if is_playlist and playlist_title_safe:
+                return str(out_dir / channel_safe / "Playlists" / playlist_title_safe / filename_tpl)
+
+            # Latest-only mode → ChannelName/Latest/
+            if mode == 'latest' or opts.get('latestOnly'):
+                return str(out_dir / channel_safe / "Latest" / filename_tpl)
+
+            # Uncategorized → ChannelName/Uncategorized/
+            if mode == 'uncategorized':
+                return str(out_dir / channel_safe / "Uncategorized" / filename_tpl)
+
+            # Default: regular uploads → ChannelName/Uploads/
+            return str(out_dir / channel_safe / "Uploads" / filename_tpl)
+
+        # Standalone playlist (non-YouTube)
+        if is_playlist and playlist_id:
+            pl_dir = f"Playlist_{playlist_id}"
+            return str(out_dir / pl_dir / filename_tpl)
+
+        # Other platforms → domain.com/
+        return str(out_dir / platform / filename_tpl)
+
+    # ── Metadata files (.last_run, latest_report.txt, download logs) ──
+
+    def _get_channel_dir(self, dl_folder: str, info: dict) -> Optional[Path]:
+        """Get the per-channel directory path from download metadata."""
+        uploader = (info.get("uploader") or info.get("channel") or "").strip()
+        if not uploader:
+            return None
+        safe = re.sub(r'[\\/:*?"<>|]', '_', uploader)[:100]
+        return Path(dl_folder) / safe
+
+    def _write_last_run(self, channel_dir: Path):
+        """Write .last_run timestamp file for a channel."""
+        try:
+            channel_dir.mkdir(parents=True, exist_ok=True)
+            ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            (channel_dir / '.last_run').write_text(ts, encoding='utf-8')
+        except Exception:
+            pass
+
+    def _write_download_log(self, channel_dir: Path, url: str, info: dict, output_path: str):
+        """Append to download_YYYYMMDD.log for the channel."""
+        try:
+            channel_dir.mkdir(parents=True, exist_ok=True)
+            today = datetime.now().strftime('%Y%m%d')
+            log_path = channel_dir / f'download_{today}.log'
+            ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            title = info.get('title', url)
+            video_id = info.get('id', '')
+            line = f'[{ts}] {title} [{video_id}] -> {output_path}\n'
+            with open(str(log_path), 'a', encoding='utf-8') as f:
+                f.write(line)
+        except Exception:
+            pass
+
+    def write_channel_metadata(self, dl_folder: str, url: str, info: dict, output_path: str):
+        """Write all metadata files for a channel's parent directory."""
+        channel_dir = self._get_channel_dir(dl_folder, info)
+        if channel_dir:
+            self._write_last_run(channel_dir)
+            self._write_download_log(channel_dir, url, info, output_path)
 
     def _build_output_template(self, dl_folder: str, opts: dict) -> str:
-        """Build an absolute output template for yt-dlp."""
+        """Build an absolute output template for yt-dlp (fallback)."""
         s = self.settings
         quality = opts.get('quality', s.get('def_quality', 'best'))
 
@@ -477,7 +570,266 @@ class YtdlpService:
         else:
             ext = '%(ext)s'
 
-        return os.path.join(dl_folder, f'%(title)s.{ext}')
+        return os.path.join(dl_folder, '%(title)s [%(id)s].%(ext)s')
+
+    # ── Channel Mode Dispatcher ────────────────────────────────────
+
+    CHANNEL_MODES = ('playlists_only', 'uploads_only', 'playlists_and_uploads',
+                     'all_uncategorized', 'latest_since_last_run')
+
+    def is_channel_mode(self, opts: dict) -> bool:
+        """Check if the options specify a YouTube channel download mode."""
+        return opts.get('mode') in self.CHANNEL_MODES
+
+    def _handle_channel_mode(self, job_id: str, url: str, opts: dict,
+                             on_progress, on_complete, on_error):
+        """Dispatch multiple sub-downloads for a YouTube channel mode.
+        
+        For each playlist, dispatches a single job; for uploads/uncategorized,
+        dispatches the channel URL with appropriate flags.
+        Uses --download-archive for dedup across all sub-downloads.
+        """
+        ytdlp = self.find_binary('yt-dlp')
+        if not ytdlp:
+            if on_error: on_error(job_id, 'yt-dlp not found')
+            return
+
+        mode = opts.get('mode', 'uploads_only')
+        dl_folder = self.settings.get('dl_folder', DOWNLOAD_DIR)
+        dl_folder_abs = str(Path(dl_folder).resolve())
+
+        # ── Step 1: Extract channel info ───────────────────────
+        info = {}
+        playlists = []
+        channel_id = ''
+        channel_name = ''
+        try:
+            info_cmd = [ytdlp, '--dump-json', '--no-playlist',
+                        '--no-warnings', '--skip-download', url,
+                        '--socket-timeout', '15']
+            ir = subprocess.run(info_cmd, capture_output=True, text=True,
+                                encoding='utf-8', errors='replace', timeout=30)
+            if ir.returncode == 0 and ir.stdout.strip():
+                info = json.loads(ir.stdout.strip().split('\n')[0])
+                channel_id = info.get('channel_id') or info.get('channel_url', '').split('/')[-1] or ''
+                channel_name = info.get('uploader') or info.get('channel') or 'Unknown'
+        except Exception as e:
+            logger.warning(f'[{job_id[:8]}] Channel info extract failed: {e}')
+
+        if not channel_name:
+            if on_error: on_error(job_id, 'Could not determine channel name')
+            return
+
+        safe_name = re.sub(r'[\\/:*?"<>|]', '_', channel_name)[:100]
+
+        # ── Step 2: Fetch playlists (for playlists modes) ──────
+        fetch_playlists = mode in ('playlists_only', 'playlists_and_uploads', 'all_uncategorized')
+        if fetch_playlists:
+            try:
+                pl_cmd = [ytdlp, '--flat-playlist', '--dump-json',
+                          '--no-warnings', '--skip-download',
+                          f'https://www.youtube.com/channel/{channel_id}/playlists'
+                          if channel_id else url.replace('/videos', '/playlists').replace('/streams', '/playlists'),
+                          '--socket-timeout', '15']
+                pr = subprocess.run(pl_cmd, capture_output=True, text=True,
+                                    encoding='utf-8', errors='replace', timeout=30)
+                if pr.returncode == 0 and pr.stdout.strip():
+                    for line in pr.stdout.strip().split('\n'):
+                        try:
+                            pl = json.loads(line)
+                            if pl.get('playlist_id') or pl.get('id'):
+                                playlists.append({
+                                    'id': pl.get('playlist_id') or pl.get('id'),
+                                    'title': pl.get('title') or pl.get('playlist_title') or f'Playlist_{len(playlists)}',
+                                    'url': f'https://www.youtube.com/playlist?list={pl.get("playlist_id") or pl.get("id")}',
+                                })
+                        except (json.JSONDecodeError, Exception):
+                            continue
+            except Exception as e:
+                logger.warning(f'[{job_id[:8]}] Playlist fetch failed: {e}')
+
+        logger.info(f'[{job_id[:8]}] Channel: {channel_name}, playlists: {len(playlists)}')
+
+        # ── Step 3: Build sub-job URLs ─────────────────────────
+        sub_urls = []
+        total_estimated = 0
+
+        if mode == 'playlists_only':
+            # Only playlist URLs
+            sub_urls = [p['url'] for p in playlists if p.get('url')]
+            total_estimated = len(sub_urls)
+
+        elif mode == 'uploads_only':
+            # Channel uploads URL (with --no-playlist)
+            channel_url = f'https://www.youtube.com/channel/{channel_id}/videos' if channel_id else url
+            sub_urls = [channel_url]
+            total_estimated = 1
+
+        elif mode in ('playlists_and_uploads', 'all_uncategorized'):
+            # Playlists + channel uploads
+            for p in playlists:
+                if p.get('url'):
+                    sub_urls.append(p['url'])
+            channel_url = f'https://www.youtube.com/channel/{channel_id}/videos' if channel_id else url
+            sub_urls.append(channel_url)
+            total_estimated = len(sub_urls)
+
+        elif mode == 'latest_since_last_run':
+            # Use --dateafter with last run date
+            last_date = self.get_latest_per_channel().get(channel_id, {}).get('upload_date', '')
+            if last_date:
+                opts['dateafter'] = last_date
+            channel_url = f'https://www.youtube.com/channel/{channel_id}/videos' if channel_id else url
+            sub_urls = [channel_url]
+            total_estimated = 1
+
+        if not sub_urls:
+            if on_error: on_error(job_id, f'No URLs to download for mode: {mode}')
+            return
+
+        # ── Step 4: Dispatch sub-downloads ─────────────────────
+        self.db.update_job(job_id, {
+            'state': 'running',
+            'title': f'{channel_name} ({mode})',
+            'progress': 0,
+        })
+        self.db.add_log(f'Channel mode "{mode}": {len(sub_urls)} sub-job(s) for {channel_name}', 'info', job_id)
+
+        # Use same archive file for dedup across all sub-jobs
+        archive_file = self.settings.get('archive_file') or str(Path(dl_folder) / '.megadl_archive.txt')
+        common_flags = [
+            '--download-archive', archive_file,
+            '--no-overwrites', '--continue',
+            '--newline', '--progress',
+        ]
+
+        completed = 0
+        failed = 0
+        total = len(sub_urls)
+        output_paths = []
+
+        for i, sub_url in enumerate(sub_urls, 1):
+            sub_job_id = f'{job_id}_{i}'
+            logger.info(f'[{job_id[:8]}] Sub-job {i}/{total}: {sub_url}')
+
+            # Build output path with correct folder structure
+            sub_info = dict(info)
+            sub_opts = dict(opts)
+            sub_opts['mode'] = 'playlist'  # yt-dlp playlist mode
+            sub_opts['_is_sub_job'] = True
+
+            # For uploads_only or the uploads sub-job, use --no-playlist
+            is_uploads = (mode == 'uploads_only' or
+                         (mode in ('playlists_and_uploads', 'all_uncategorized') and i == total))
+
+            # Build command
+            cmd = [ytdlp]
+            quality = sub_opts.get('quality', self.settings.get('def_quality', 'best'))
+            if quality in ('mp3',):
+                cmd += ['-x', '--audio-format', 'mp3', '--audio-quality', '0']
+            elif quality in ('m4a',):
+                cmd += ['-x', '--audio-format', 'm4a']
+            elif quality == 'best':
+                cmd += ['-f', 'bestvideo+bestaudio/best']
+            else:
+                cmd += ['-f', f'bestvideo[height<={quality}]+bestaudio/best[height<={quality}]/best']
+
+            if quality not in ('mp3', 'm4a'):
+                merge = sub_opts.get('merge_format') or self.settings.get('merge_format', 'mp4')
+                cmd += ['--merge-output-format', merge]
+
+            cmd += ['--retries', '3', '--fragment-retries', '5',
+                    '--socket-timeout', '30']
+            cmd += common_flags
+
+            # Playlist handling
+            if is_uploads:
+                cmd += ['--no-playlist']
+            else:
+                cmd += ['--yes-playlist']
+
+            # Latest-only
+            if sub_opts.get('dateafter'):
+                cmd += ['--dateafter', sub_opts['dateafter']]
+
+            # Build output template
+            output_tpl = self._build_output_path(dl_folder_abs, sub_url, sub_info, sub_opts)
+            Path(output_tpl).parent.mkdir(parents=True, exist_ok=True)
+            cmd += ['-o', output_tpl]
+            cmd.append(sub_url)
+
+            logger.info(f'[{job_id[:8]}] Sub-cmd: {" ".join(cmd[:8])}...')
+
+            # Progress tracking
+            sub_progress = {'percent': 0}
+            def _make_progress_cb(jid, idx, total):
+                def cb(progress):
+                    overall = ((idx - 1) * 100 + progress.get('percent', 0)) / max(total, 1)
+                    self.db.update_job(jid, {'progress': overall})
+                    if on_progress:
+                        on_progress(jid, {'percent': overall, 'sub': idx, 'total': total})
+                return cb
+
+            try:
+                proc = subprocess.Popen(
+                    cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                    text=True, encoding='utf-8', errors='replace',
+                )
+                for line in iter(proc.stdout.readline, ''):
+                    line = line.rstrip()
+                    if not line: continue
+                    self.db.add_log(line, 'debug', job_id)
+                    prog = self._parse_progress(line)
+                    if prog:
+                        sub_progress = prog
+                        overall = ((i - 1) * 100 + prog.get('percent', 0)) / max(total, 1)
+                        self.db.update_job(job_id, {'progress': overall})
+                        if on_progress:
+                            on_progress(job_id, {
+                                'percent': overall,
+                                'sub': i,
+                                'total': total,
+                                'speed': prog.get('speed', 0),
+                                'eta': prog.get('eta', 0),
+                            })
+
+                    # Track output path
+                    dest_match = re.search(r'\[download\] Destination:\s*(.+)', line)
+                    if dest_match:
+                        rel_path = dest_match.group(1).strip()
+                        abs_path = str((Path(dl_folder_abs) / rel_path).resolve())
+                        if abs_path not in output_paths:
+                            output_paths.append(abs_path)
+
+                proc.wait()
+                if proc.returncode == 0:
+                    completed += 1
+                    logger.info(f'[{job_id[:8]}] Sub-job {i} done')
+                else:
+                    failed += 1
+                    logger.warning(f'[{job_id[:8]}] Sub-job {i} failed (code {proc.returncode})')
+            except Exception as e:
+                failed += 1
+                logger.warning(f'[{job_id[:8]}] Sub-job {i} error: {e}')
+
+        # ── Step 5: Finalize ───────────────────────────────────
+        # Write metadata
+        channel_dir = Path(dl_folder_abs) / safe_name
+        self._write_last_run(channel_dir)
+
+        # Update latest-per-channel
+        if channel_id and info.get('id'):
+            self.save_latest_per_channel(channel_id, info.get('id', ''), info.get('upload_date', ''))
+
+        final_output = output_paths[0] if output_paths else str(channel_dir)
+        self.db.update_job(job_id, {
+            'state': 'done',
+            'progress': 100,
+            'output_path': final_output,
+        })
+        self.db.add_log(f'Channel mode "{mode}" complete: {completed}/{total} sub-jobs', 'info', job_id)
+        if on_complete:
+            on_complete(job_id, final_output)
 
     def _download_worker(self, job_id: str, url: str, opts: dict,
                          on_progress, on_complete, on_error):
@@ -498,6 +850,11 @@ class YtdlpService:
             return
 
         logger.info(f'[{job_id[:8]}] Download folder: {dl_folder_abs}')
+
+        # Route channel mode to dedicated handler
+        if self.is_channel_mode(opts):
+            self._handle_channel_mode(job_id, url, opts, on_progress, on_complete, on_error)
+            return
 
         # Quick info extract for smart folder structure
         info_data = {}
@@ -646,8 +1003,9 @@ class YtdlpService:
                     })
                     self.db.add_log(f'Download completed -> {output_path}', 'info', job_id)
                     logger.info(f'[{job_id[:8]}] [DONE] Saved to: {output_path}')
-                    logger.info(f'[{job_id[:8]}] [DONE] Exists: {os.path.exists(output_path)}')
-                    logger.info(f'[{job_id[:8]}] [DONE] Size: {os.path.getsize(output_path) if os.path.exists(output_path) else 0}')
+
+                    # Write channel metadata files (.last_run, download log)
+                    self.write_channel_metadata(dl_folder_abs, url, info_data, output_path)
                 else:
                     self.db.update_job(job_id, {
                         'state': 'done',

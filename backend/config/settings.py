@@ -118,31 +118,31 @@ class Settings:
 
     def _detect_download_dir(self) -> Path:
         """Return the best writable download directory for this platform.
-        Always prefers a dedicated 'MegaDL' subfolder in the system's Downloads folder."""
+        Uses organized folder structure: AW/AW-DL/ in the user's Downloads folder."""
         candidates = []
         system = platform.system().lower()
 
         if system == 'android' or os.path.exists('/sdcard'):
             candidates += [
+                Path('/storage/emulated/0/Download/AW/AW-DL'),
+                Path('/sdcard/Download/AW/AW-DL'),
                 Path('/storage/emulated/0/Download/MegaDL'),
                 Path('/sdcard/Download/MegaDL'),
-                Path('/storage/emulated/0/Download'),
-                Path('/sdcard/Download'),
             ]
 
         if system in ('linux', 'darwin') or 'linux' in sys.platform:
             home = Path.home()
             candidates += [
+                home / 'Downloads' / 'AW' / 'AW-DL',
                 home / 'Downloads' / 'MegaDL',
                 home / 'megadl_downloads',
-                home / 'Downloads',
             ]
 
         if system == 'windows' or 'win' in sys.platform:
             user_profile = os.environ.get('USERPROFILE', 'C:/Users/User')
             candidates += [
+                Path(user_profile) / 'Downloads' / 'AW' / 'AW-DL',
                 Path(user_profile) / 'Downloads' / 'MegaDL',
-                Path(user_profile) / 'Downloads',
             ]
 
         for path in candidates:

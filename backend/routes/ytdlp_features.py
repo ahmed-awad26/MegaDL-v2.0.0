@@ -2,19 +2,9 @@
 YouTube Uncategorized + Latest-Only endpoints."""
 
 from flask import Blueprint, request, jsonify
-from .ping import ok, err, get_db, get_settings
-from services.ytdlp_service import YtdlpService
+from .ping import ok, err, get_ytdlp
 
 ytdlp_features_bp = Blueprint('ytdlp_features', __name__)
-
-
-def get_ytdlp():
-    from flask import current_app
-    svc = current_app.config.get('YTDLP_SERVICE')
-    if svc is None:
-        svc = YtdlpService(get_settings(), get_db())
-        current_app.config['YTDLP_SERVICE'] = svc
-    return svc
 
 
 @ytdlp_features_bp.route('/api/ytdlp/uncategorized', methods=['GET'])

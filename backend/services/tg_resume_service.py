@@ -138,7 +138,10 @@ class TelegramResumeService:
         job = self.get_job(job_id)
         if not job:
             return 0
-        return job.get('rollback_offset') or job.get('downloaded_bytes', 0)
+        ro = job.get('rollback_offset')
+        if ro is not None:
+            return ro
+        return job.get('downloaded_bytes', 0)
 
     def remove_job(self, job_id: str):
         """Remove a completed/failed job from state."""
