@@ -322,6 +322,77 @@ class YtdlpService:
         except Exception:
             pass
 
+    def rebuild_master_archive(self, dl_folder: str = ''):
+        """Build a comprehensive master archive by scanning all download
+        folders for existing archive files and filenames containing [video_id].
+
+        This mirrors the 'master archive' approach from AW Downloader:
+        Source 1 — Merge all existing .megadl_archive / .ytdl_archive files
+        Source 2 — Scan filenames for [XXXXXXXXXXX] (YouTube 11-char ID)
+        """
+        dl_folder = dl_folder or self.settings.get('dl_folder', DOWNLOAD_DIR)
+        archive_file = Path(self.settings.get('archive_file') or
+                            str(Path(dl_folder) / '.megadl_archive.txt'))
+
+        entries = set()
+        base = Path(dl_folder)
+        if not base.exists():
+            return
+
+        # Source 1: merge all archive files under dl_folder
+        for arc in base.rglob('.megadl_archive.txt'):
+            try:
+                for line in arc.read_text(encoding='utf-8', errors='replace').splitlines():
+                    line = line.strip()
+                    if line and not line.startswith('#'):
+                        entries.add(line)
+            except Exception:
+                pass
+
+        # Source 2: scan filenames for [VIDEO_ID] pattern
+        video_id_pat = re.compile(r'\[([A-Za-z0-9_-]{11})\]')
+        for f in base.rglob('*'):
+            if f.is_file() and f.suffix.lower() in (
+                '.mp4', '.mkv', '.webm', '.mp3', '.m4a',
+                '.flac', '.wav', '.ogg', '.avi', '.mov',
+            ):
+                m = video_id_pat.search(f.stem)
+                if m:
+                    entries.add(f'youtube {m.group(1)}')
+
+        # Write merged master archive
+        try:
+            archive_file.parent.mkdir(parents=True, exist_ok=True)
+            archive_file.write_text(
+                '\n'.join(sorted(entries)) + '\n',
+                encoding='utf-8',
+            )
+            logger.info(f'[ARCHIVE] Master archive rebuilt: {len(entries)} entries')
+        except Exception as e:
+            logger.warning(f'[ARCHIVE] Failed to write master archive: {e}')
+
+    def sync_folder_archive(self, folder_path: str):
+        """Sync a per-folder .ytdl_archive back into the master archive."""
+        folder = Path(folder_path)
+        local_arc = folder / '.ytdl_archive'
+        if not local_arc.exists():
+            return
+        dl_folder = self.settings.get('dl_folder', DOWNLOAD_DIR)
+        master = Path(self.settings.get('archive_file') or
+                      str(Path(dl_folder) / '.megadl_archive.txt'))
+        try:
+            local_lines = set(local_arc.read_text(encoding='utf-8',
+                              errors='replace').splitlines())
+            master_lines = set()
+            if master.exists():
+                master_lines = set(master.read_text(encoding='utf-8',
+                                   errors='replace').splitlines())
+            merged = sorted(master_lines | local_lines)
+            master.write_text('\n'.join(merged) + '\n', encoding='utf-8')
+            logger.info(f'[ARCHIVE] Synced {len(local_lines)} entries from {folder.name}')
+        except Exception as e:
+            logger.warning(f'[ARCHIVE] Sync failed for {folder.name}: {e}')
+
     # ── Pre-download validation ──────────────────────────────
 
     def _validate_dl_folder(self, dl_folder: str) -> Optional[str]:
@@ -588,7 +659,12 @@ class YtdlpService:
         For each playlist, dispatches a single job; for uploads/uncategorized,
         dispatches the channel URL with appropriate flags.
         Uses --download-archive for dedup across all sub-downloads.
+        Rebuilds the master archive before starting to avoid re-downloads.
         """
+        # Rebuild master archive from existing files before starting
+        dl_folder = self.settings.get('dl_folder', DOWNLOAD_DIR)
+        self.rebuild_master_archive(dl_folder)
+
         ytdlp = self.find_binary('yt-dlp')
         if not ytdlp:
             self.db.update_job(job_id, {'state': 'error', 'error': 'yt-dlp not found'})
@@ -805,6 +881,11 @@ class YtdlpService:
                             output_paths.append(abs_path)
 
                 proc.wait()
+
+                # Sync per-folder archive back to master archive
+                out_dir = Path(output_tpl).parent
+                self.sync_folder_archive(str(out_dir))
+
                 if proc.returncode == 0:
                     completed += 1
                     logger.info(f'[{job_id[:8]}] Sub-job {i} done')
@@ -836,13 +917,15 @@ class YtdlpService:
 
     def _download_worker(self, job_id: str, url: str, opts: dict,
                          on_progress, on_complete, on_error):
+        # Rebuild master archive from existing files to avoid re-downloads
+        dl_folder = self.settings.get('dl_folder', DOWNLOAD_DIR)
+        self.rebuild_master_archive(dl_folder)
+        dl_folder_abs = str(Path(dl_folder).resolve())
+
         ytdlp  = self.find_binary('yt-dlp')
         if not ytdlp:
             if on_error: on_error(job_id, 'yt-dlp not found')
             return
-
-        dl_folder = self.settings.get('dl_folder', DOWNLOAD_DIR)
-        dl_folder_abs = str(Path(dl_folder).resolve())
 
         err_msg = self._validate_dl_folder(dl_folder_abs)
         if err_msg:

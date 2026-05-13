@@ -112,6 +112,7 @@ from routes.ytdlp_update import ytdlp_update_bp
 from routes.api_keys import api_keys_bp
 from routes.ytdlp_features import ytdlp_features_bp
 from routes.filehost import filehost_bp
+from routes.website import website_bp
 
 app.register_blueprint(ping_bp)
 app.register_blueprint(info_bp)
@@ -134,6 +135,7 @@ app.register_blueprint(ytdlp_update_bp)
 app.register_blueprint(api_keys_bp)
 app.register_blueprint(ytdlp_features_bp)
 app.register_blueprint(filehost_bp)
+app.register_blueprint(website_bp)
 
 # ── Queue compatibility endpoint ─────────────────────────────
 @app.route('/api/queue', methods=['GET'])

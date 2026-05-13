@@ -22,7 +22,7 @@ DEPS = {
     'telethon':         'telethon',
     'cryptg':           'cryptg',
     'aiofiles':         'aiofiles',
-    'psutil':           'psutil',
+    'psutil':           'psutil',          # Optional — Termux aarch64 has no wheel, skip gracefully
     'requests':         'requests',
     'openpyxl':         'openpyxl',
     'mega.py':          'mega.py',

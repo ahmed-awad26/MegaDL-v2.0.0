@@ -7,7 +7,7 @@ import sqlite3
 import json
 import logging
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 from threading import Lock
 from contextlib import contextmanager
 
@@ -302,7 +302,7 @@ class Database:
         result = {}
         for row in rows:
             try: result[row['key']] = json.loads(row['value'])
-            except: result[row['key']] = row['value']
+            except (json.JSONDecodeError, TypeError): result[row['key']] = row['value']
         return result
 
     def save_settings(self, settings: dict):
@@ -390,7 +390,7 @@ class Database:
 # ── Helpers ──────────────────────────────────────────────────
 
 def _now() -> str:
-    return datetime.utcnow().isoformat()
+    return datetime.now(timezone.utc).isoformat()
 
 def _now_time() -> str:
     return datetime.now().strftime('%H:%M:%S')
@@ -403,5 +403,5 @@ def _row_to_dict(row) -> dict:
     for key in ('options',):
         if key in d and d[key]:
             try: d[key] = json.loads(d[key])
-            except: pass
+            except (json.JSONDecodeError, TypeError): pass
     return d

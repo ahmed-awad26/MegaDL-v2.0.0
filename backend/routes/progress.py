@@ -33,7 +33,7 @@ def stream_progress():
                     opts = {}
                     if isinstance(opts_raw, str):
                         try: opts = json.loads(opts_raw)
-                        except: pass
+                        except (json.JSONDecodeError, TypeError): pass
                     elif isinstance(opts_raw, dict):
                         opts = opts_raw
                     data.append({

@@ -12,7 +12,7 @@ import logging
 import threading
 from pathlib import Path
 from typing import Optional, Callable
-from datetime import datetime
+from datetime import datetime, timezone
 
 logger = logging.getLogger('megadl.telegram')
 
@@ -28,6 +28,7 @@ class TelegramService:
         self._lock    = threading.Lock()
         self._started = False
         self._user_phone = None
+        self._phone_code_hash = ''
         self.current_file = ""
         self._download_history: list = []
         self._ensure_session_dir()  # Ensure session directory exists
@@ -127,11 +128,12 @@ class TelegramService:
 
             sent = await client.send_code_request(phone)
             self._user_phone = phone
+            self._phone_code_hash = getattr(sent, 'phone_code_hash', '')
             return {
                 'ok': True,
                 'authorized': False,
                 'phone': phone,
-                'phone_code_hash': getattr(sent, 'phone_code_hash', ''),
+                'phone_code_hash': self._phone_code_hash,
                 'timeout': getattr(sent, 'timeout', 30),
             }
 
@@ -143,6 +145,18 @@ class TelegramService:
 
             # Handle specific Telethon errors with user-friendly messages
             if 'all available options' in err_str.lower():
+                # If we have a code hash from a previous successful send,
+                # the code may have already been delivered — let user try it
+                if self._phone_code_hash:
+                    self._user_phone = phone
+                    return {
+                        'ok': True,
+                        'code_previously_sent': True,
+                        'authorized': False,
+                        'phone': phone,
+                        'phone_code_hash': self._phone_code_hash,
+                        'error': 'Rate-limited, but a code was already sent. Enter it below.',
+                    }
                 return {
                     'ok': False,
                     'error': 'All verification methods exhausted. Please wait 10 minutes before trying again, or use a different phone number.',
@@ -177,7 +191,10 @@ class TelegramService:
             await self._ensure_connected()
             client = await self._get_client()
             try:
-                await client.sign_in(phone, code)
+                kwargs = {}
+                if self._phone_code_hash:
+                    kwargs['phone_code_hash'] = self._phone_code_hash
+                await client.sign_in(phone, code, **kwargs)
             except Exception as e:
                 err_str = str(e)
                 # 2FA required
@@ -664,7 +681,7 @@ class TelegramService:
             'size': file_size,
             'type': file_type,
             'status': status,
-            'time': datetime.utcnow().timestamp(),
+            'time': datetime.now(timezone.utc).timestamp(),
         })
         if len(history) > 2000:
             history[:] = history[-2000:]
@@ -772,4 +789,4 @@ def _detect_type(message) -> str:
     return 'unknown'
 
 def _now_iso() -> str:
-    return datetime.utcnow().isoformat()
+    return datetime.now(timezone.utc).isoformat()
