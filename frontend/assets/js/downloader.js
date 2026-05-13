@@ -670,42 +670,6 @@ MegaDL.Downloader = (() => {
     selectedFormat = null;
   }
 
-    const opts = { ..._buildOptions() };
-    if (format?.id)  opts.format_id  = format.id;
-    if (format?.ext) opts.format_ext = format.ext;
-
-    const btn = $('download-btn');
-    if (btn) {
-      btn.disabled = true;
-      btn.innerHTML = `<span class="loading-spinner sm"></span><span>Queuing...</span>`;
-    }
-
-    try {
-      const res = await API.startDownload(safeUrl, opts);
-      haptic('success');
-      MegaDL.App?.toast(`⬇️ Download queued!`, 'success');
-
-      // Clear input
-      const input = $('url-input');
-      if (input) input.value = '';
-      hide('video-info-card');
-      currentInfo   = null;
-      selectedFormat = null;
-
-      // Navigate to active jobs
-      MegaDL.Router.navigate('active');
-      MegaDL.Jobs.forceRefresh();
-
-    } catch (err) {
-      MegaDL.App?.toast(`❌ ${err.message}`, 'error');
-    } finally {
-      if (btn) {
-        btn.disabled = false;
-        btn.innerHTML = `<span class="btn-icon">⬇️</span><span>Download</span>`;
-      }
-    }
-  }
-
   /* ── Handle multiple URLs pasted ─────────────────────────── */
 
   function _handleMultipleUrls(urls) {
