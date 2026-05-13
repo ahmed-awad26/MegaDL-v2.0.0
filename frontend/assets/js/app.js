@@ -14,8 +14,10 @@ MegaDL.App = (() => {
   /* ── Bootstrap ───────────────────────────────────────────── */
 
   async function init() {
-    // Init router first (pages need to exist)
-    Router.init();
+    let backend = null;
+    try {
+      // Init router first (pages need to exist)
+      Router.init();
 
     // Register per-page handlers
     Router.register('files',       { onEnter: () => Files.load('') });
@@ -51,7 +53,7 @@ MegaDL.App = (() => {
     _initPageToolbars();
 
     // Detect backend then start
-    const backend = await API.detectBackend();
+    backend = await API.detectBackend();
     _updateBackendIndicator(backend);
     Logs.appendLog(`Backend: ${backend || 'none detected'}`, backend ? 'info' : 'warning');
 
@@ -64,11 +66,14 @@ MegaDL.App = (() => {
     // Load history for about/stats
     await _refreshStats();
 
-    // Check first-run setup (Telegram API keys)
-    _checkFirstRunSetup();
+      // Check first-run setup (Telegram API keys)
+      _checkFirstRunSetup();
 
-    // Show app and hide splash
-    _hideSplash();
+    } catch (e) {
+      console.error('Init error:', e);
+    } finally {
+      _hideSplash();
+    }
 
     // Store version
     document.getElementById('app-version')?.textContent && null;
