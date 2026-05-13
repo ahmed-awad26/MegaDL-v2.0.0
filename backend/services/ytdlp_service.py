@@ -591,6 +591,7 @@ class YtdlpService:
         """
         ytdlp = self.find_binary('yt-dlp')
         if not ytdlp:
+            self.db.update_job(job_id, {'state': 'error', 'error': 'yt-dlp not found'})
             if on_error: on_error(job_id, 'yt-dlp not found')
             return
 
@@ -617,6 +618,7 @@ class YtdlpService:
             logger.warning(f'[{job_id[:8]}] Channel info extract failed: {e}')
 
         if not channel_name:
+            self.db.update_job(job_id, {'state': 'error', 'error': 'Could not determine channel name'})
             if on_error: on_error(job_id, 'Could not determine channel name')
             return
 
@@ -684,6 +686,7 @@ class YtdlpService:
             total_estimated = 1
 
         if not sub_urls:
+            self.db.update_job(job_id, {'state': 'error', 'error': f'No URLs to download for mode: {mode}'})
             if on_error: on_error(job_id, f'No URLs to download for mode: {mode}')
             return
 
@@ -853,7 +856,12 @@ class YtdlpService:
 
         # Route channel mode to dedicated handler
         if self.is_channel_mode(opts):
-            self._handle_channel_mode(job_id, url, opts, on_progress, on_complete, on_error)
+            try:
+                self._handle_channel_mode(job_id, url, opts, on_progress, on_complete, on_error)
+            except Exception as e:
+                self.db.update_job(job_id, {'state': 'error', 'error': f'Channel mode error: {e}'})
+                self.db.add_log(f'Channel mode exception: {e}', 'error', job_id)
+                if on_error: on_error(job_id, str(e))
             return
 
         # Quick info extract for smart folder structure

@@ -178,6 +178,10 @@ class DownloadQueue:
                 self.db.update_job(job_id, {'state': 'queued', 'error': None, 'options': opts})
                 with self._lock:
                     self._queue.append({'id': job_id, 'url': job['url'], 'opts': opts})
+                return
+
+        # Retries exhausted — mark as permanently failed
+        self.db.update_job(job_id, {'state': 'error', 'error': error})
 
     # ── Job control ──────────────────────────────────────────
 
