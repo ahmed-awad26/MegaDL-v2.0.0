@@ -133,6 +133,10 @@
           <span class="nav-icon">✈️</span>
           <span class="nav-label">Telegram</span>
         </a>
+        <a class="nav-item" data-page="website" href="#website">
+          <span class="nav-icon">🌐</span>
+          <span class="nav-label">Website DL</span>
+        </a>
         <a class="nav-item" data-page="logs" href="#logs">
           <span class="nav-icon">📄</span>
           <span class="nav-label">Logs</span>
@@ -337,36 +341,111 @@
             </div>
           </div>
 
-          <!-- Stats Row -->
-          <div class="stats-row">
-            <div class="stat-card glass-card">
-              <div class="stat-icon">⬇️</div>
-              <div class="stat-value" id="stat-total">0</div>
-              <div class="stat-label">Total Downloads</div>
+          <!-- Dashboard -->
+          <div class="dashboard" id="dashboard">
+            <div class="dash-welcome glass-card" id="dash-welcome">
+              <div class="dash-welcome-icon">↓</div>
+              <div class="dash-welcome-text">
+                <div class="dash-welcome-title" id="dash-welcome-title">Welcome to MegaDL</div>
+                <div class="dash-welcome-sub" id="dash-welcome-sub">Paste a URL above to start downloading</div>
+              </div>
+              <div class="dash-backend" id="dash-backend">
+                <span class="backend-dot" id="dash-dot"></span>
+                <span id="dash-backend-label">Connecting...</span>
+              </div>
             </div>
-            <div class="stat-card glass-card">
-              <div class="stat-icon">▶️</div>
-              <div class="stat-value" id="stat-active">0</div>
-              <div class="stat-label">Active</div>
+
+            <!-- Stat Cards -->
+            <div class="dash-cards">
+              <div class="dash-card glass-card" id="dash-card-total">
+                <div class="dash-card-icon">⬇️</div>
+                <div class="dash-card-body">
+                  <div class="dash-card-value" id="stat-total">0</div>
+                  <div class="dash-card-label">Total</div>
+                </div>
+                <div class="dash-card-trend" id="stat-today-badge" style="display:none">+0 today</div>
+              </div>
+              <div class="dash-card glass-card" id="dash-card-active">
+                <div class="dash-card-icon">▶️</div>
+                <div class="dash-card-body">
+                  <div class="dash-card-value" id="stat-active">0</div>
+                  <div class="dash-card-label">Active</div>
+                </div>
+                <div class="dash-card-sub" id="stat-queued" style="font-size:.65rem;color:var(--text-muted)">0 queued</div>
+              </div>
+              <div class="dash-card glass-card" id="dash-card-done">
+                <div class="dash-card-icon">✅</div>
+                <div class="dash-card-body">
+                  <div class="dash-card-value" id="stat-done">0</div>
+                  <div class="dash-card-label">Completed</div>
+                </div>
+                <div class="dash-card-sub" id="stat-failed" style="font-size:.65rem;color:var(--text-muted)">0 failed</div>
+              </div>
+              <div class="dash-card glass-card" id="dash-card-size">
+                <div class="dash-card-icon">💾</div>
+                <div class="dash-card-body">
+                  <div class="dash-card-value" id="stat-size">0 B</div>
+                  <div class="dash-card-label">Downloaded</div>
+                </div>
+              </div>
             </div>
-            <div class="stat-card glass-card">
-              <div class="stat-icon">💾</div>
-              <div class="stat-value" id="stat-size">0 GB</div>
-              <div class="stat-label">Downloaded</div>
+
+            <!-- Storage Bar -->
+            <div class="dash-storage" id="dash-storage">
+              <div class="dash-storage-header">
+                <span>Storage</span>
+                <span class="dash-storage-text" id="storage-text">Calculating...</span>
+              </div>
+              <div class="dash-storage-bar">
+                <div class="dash-storage-fill" id="storage-fill" style="width:0%"></div>
+              </div>
             </div>
-            <div class="stat-card glass-card">
-              <div class="stat-icon">✅</div>
-              <div class="stat-value" id="stat-done">0</div>
-              <div class="stat-label">Completed</div>
+
+            <!-- System Health -->
+            <div class="dash-system glass-card" id="dash-system">
+              <div class="dash-system-title">System</div>
+              <div class="dash-system-grid">
+                <div class="dash-system-item">
+                  <span class="dash-system-dot" id="sys-ytdlp-dot"></span>
+                  <span class="dash-system-name">yt-dlp</span>
+                  <span class="dash-system-ver" id="sys-ytdlp-ver">—</span>
+                </div>
+                <div class="dash-system-item">
+                  <span class="dash-system-dot" id="sys-ffmpeg-dot"></span>
+                  <span class="dash-system-name">ffmpeg</span>
+                  <span class="dash-system-ver" id="sys-ffmpeg-ver">—</span>
+                </div>
+                <div class="dash-system-item">
+                  <span class="dash-system-dot" id="sys-py-dot"></span>
+                  <span class="dash-system-name">Python</span>
+                  <span class="dash-system-ver" id="sys-py-ver">—</span>
+                </div>
+                <div class="dash-system-item">
+                  <span class="dash-system-dot" id="sys-be-dot"></span>
+                  <span class="dash-system-name">Backend</span>
+                  <span class="dash-system-ver" id="sys-be-ver">—</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="dash-recent glass-card" id="dash-recent">
+              <div class="dash-recent-header">
+                <span>Recent Downloads</span>
+                <a class="section-action" data-page="history" href="#history">View All</a>
+              </div>
+              <div class="dash-recent-list" id="dash-recent-list">
+                <div class="dash-recent-empty">No downloads yet</div>
+              </div>
             </div>
           </div>
 
-          <!-- Active Jobs Preview -->
-          <div class="section-header">
+          <!-- Legacy active jobs (kept for backward compat with home page) -->
+          <div class="section-header" style="display:none">
             <span class="section-title">Active Downloads</span>
             <a class="section-action" data-page="active" href="#active">View All</a>
           </div>
-          <div class="jobs-list" id="home-active-jobs">
+          <div class="jobs-list" id="home-active-jobs" style="display:none">
             <div class="empty-state" id="home-empty-state">
               <div class="empty-icon">📭</div>
               <div class="empty-title">No active downloads</div>
@@ -739,6 +818,41 @@
                 <span class="log-msg">MegaDL initializing...</span>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======= WEBSITE DOWNLOADER PAGE ======= -->
+      <section class="page" id="page-website">
+        <div class="page-container">
+          <div class="page-toolbar">
+            <span class="section-title" style="font-size:1.2rem">🌐 Website Downloader</span>
+            <span id="website-status" class="tg-status">Checking...</span>
+          </div>
+          <div class="glass-card" style="padding:20px">
+            <div class="tg-form">
+              <label for="website-url-input">Website URL</label>
+              <div style="display:flex;gap:8px">
+                <input type="url" id="website-url-input" placeholder="https://example.com" style="flex:1">
+                <button class="btn btn-primary" id="website-url-btn" disabled>⬇ Download Website</button>
+              </div>
+              <button class="btn btn-sm btn-muted" id="website-refresh-btn" style="margin-top:8px">🔄 Check wget</button>
+            </div>
+            <div id="website-progress-container" style="display:none;margin-top:16px">
+              <div class="progress-bar">
+                <div class="progress-fill" id="website-progress-bar" style="width:0%">0 files</div>
+              </div>
+              <p id="website-dl-status" style="margin-top:8px;font-size:0.85rem"></p>
+              <div id="website-log" style="max-height:300px;overflow-y:auto;background:var(--bg-dark);padding:8px;border-radius:6px;font-family:monospace;font-size:0.8rem;margin-top:8px"></div>
+              <a id="website-download-link" class="btn btn-success" style="display:none;margin-top:12px" target="_blank">📦 Download ZIP</a>
+            </div>
+          </div>
+          <div class="glass-card" style="margin-top:16px;padding:20px">
+            <p style="font-size:0.85rem;color:var(--text-muted)">
+              Downloads complete websites (HTML, CSS, JS, images) for offline viewing using wget.
+              Uses <code>--mirror --convert-links --adjust-extension --page-requisites --no-parent</code> flags.
+              The site is packaged as a ZIP archive after download.
+            </p>
           </div>
         </div>
       </section>
@@ -1326,6 +1440,10 @@
         <span class="bnav-icon">✈️</span>
         <span class="bnav-label">Telegram</span>
       </a>
+      <a class="bottom-nav-item" data-page="website" href="#website">
+        <span class="bnav-icon">🌐</span>
+        <span class="bnav-label">Website</span>
+      </a>
       <a class="bottom-nav-item" data-page="downloads" href="#downloads">
         <span class="bnav-icon">📂</span>
         <span class="bnav-label">Files</span>
@@ -1435,6 +1553,7 @@
   <script src="assets/js/files.js"></script>
   <script src="assets/js/logs.js"></script>
   <script src="assets/js/telegram.js"></script>
+  <script src="assets/js/website.js"></script>
   <script src="assets/js/diagnostics.js"></script>
   <script src="assets/js/search.js"></script>
   <script src="assets/js/pwa.js"></script>

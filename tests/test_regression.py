@@ -40,7 +40,7 @@ TEST_SETTINGS = {
 def cleanup():
     for f in [TEST_DB, TEST_DB + '-wal', TEST_DB + '-shm']:
         try: os.unlink(f)
-        except: pass
+        except OSError: pass
     dl = Path(TEST_SETTINGS['dl_folder'])
     if dl.exists():
         shutil.rmtree(str(dl), ignore_errors=True)

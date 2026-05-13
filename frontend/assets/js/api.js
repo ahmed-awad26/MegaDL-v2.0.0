@@ -261,6 +261,26 @@ MegaDL.API = (() => {
     });
   }
 
+  async function testDlFolder(path) {
+    return apiFetch('/api/settings/test-dl-folder', {
+      method: 'POST',
+      body: { path },
+      timeout: 10000,
+    });
+  }
+
+  async function getApiKeys() {
+    return apiFetch('/api/api-keys', { timeout: 5000 });
+  }
+
+  async function validateApiKey(provider, key) {
+    return apiFetch('/api/api-keys/validate', {
+      method: 'POST',
+      body: { provider, key },
+      timeout: 15000,
+    });
+  }
+
   /* ── Logs ────────────────────────────────────────────────── */
 
   async function getLogs(filter = {}) {
@@ -549,6 +569,32 @@ MegaDL.API = (() => {
     });
   }
 
+  /* ── Website Downloader ──────────────────────────────────── */
+
+  async function websiteCheck() {
+    return apiFetch('/api/website/check', { timeout: 5000 });
+  }
+
+  async function websiteDownload(url) {
+    return apiFetch('/api/website/download', {
+      method: 'POST',
+      body: { url },
+      timeout: 10000,
+    });
+  }
+
+  async function websiteStatus(jobId) {
+    return apiFetch(`/api/website/status/${jobId}`, { timeout: 10000 });
+  }
+
+  async function websiteLog(jobId) {
+    return apiFetch(`/api/website/log/${jobId}`, { timeout: 5000 });
+  }
+
+  async function websiteCancel(jobId) {
+    return apiFetch(`/api/website/cancel/${jobId}`, { method: 'POST' });
+  }
+
   /* ── Expose ──────────────────────────────────────────────── */
   return {
     detectBackend, getBackend, resetDetection,
@@ -562,7 +608,8 @@ MegaDL.API = (() => {
     getArchive, clearArchive,
     getFavorites, addFavorite, removeFavorite,
     listFiles, deleteFile, renameFile,
-    getSettings, saveSettings,
+    getSettings, saveSettings, testDlFolder,
+    getApiKeys, validateApiKey,
     getLogs, clearLogs,
     runDiagnostics,
     getStats,
@@ -581,6 +628,7 @@ MegaDL.API = (() => {
     getFailedLinks, clearFailedLinks,
     ytdlpCheckUpdate, ytdlpUpdate,
     urlClean, urlInfo, urlPreview, urlPreviewContent, filehostDownload,
+    websiteCheck, websiteDownload, websiteStatus, websiteLog, websiteCancel,
     APIError,
   };
 })();
@@ -589,7 +637,8 @@ MegaDL.API = (() => {
 
 async function openDownloadedFile(jobId) {
     try {
-        const res = await fetch(`/api/jobs/${jobId}/download`);
+        const baseUrl = MegaDL.API.getBackend() === 'php' ? MegaDL.Config.phpBackendPath : MegaDL.Config.pythonBackendUrl;
+        const res = await fetch(`${baseUrl}/api/jobs/${jobId}/download`);
         const data = await res.json();
 
         if (data.ok && data.file && data.file.path) {
@@ -597,9 +646,9 @@ async function openDownloadedFile(jobId) {
             return;
         }
 
-        window.location.href = `/api/jobs/${jobId}/download`;
+        window.location.href = `${baseUrl}/api/jobs/${jobId}/download`;
     } catch (e) {
         console.error(e);
-        window.location.href = `/api/jobs/${jobId}/download`;
+        window.location.href = `${baseUrl || ''}/api/jobs/${jobId}/download`;
     }
 }

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Quick smoke test against running Flask server."""
+__test__ = False  # prevent pytest collection (it's a standalone script)
 import urllib.request, json, sys
 
 BASE = 'http://127.0.0.1:5001'

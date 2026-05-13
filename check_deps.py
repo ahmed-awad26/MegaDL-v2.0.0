@@ -41,7 +41,6 @@ REQUIRED = [
     # cryptg is optional (speeds up Telegram)
     ('cryptg',          'cryptg',           '0.4.0'),
     ('aiofiles',        'aiofiles',         '23.0.0'),
-    ('psutil',          'psutil',           '5.9.0'),
     ('requests',        'requests',         '2.31.0'),
     ('openpyxl',        'openpyxl',         '3.1.0'),
     ('PIL',             'pillow',           '10.0.0'),
@@ -54,6 +53,7 @@ REQUIRED = [
 
 # Optional packages (won't fail if missing)
 OPTIONAL = [
+    ('psutil',          'psutil',           '5.9.0'),       # Termux aarch64: no wheel, skip gracefully
     ('googleapiclient', 'google-api-python-client', '2.0.0'),
     ('google.auth',     'google-auth-oauthlib',      '1.0.0'),
     ('selenium',        'selenium',                  '4.15.0'),
@@ -194,6 +194,7 @@ def main():
     binaries = [
         ('yt-dlp', 'pip install yt-dlp'),
         ('ffmpeg', 'apt install ffmpeg / pkg install ffmpeg'),
+        ('wget', 'apt install wget / pkg install wget'),
     ]
     
     all_bin_ok = True

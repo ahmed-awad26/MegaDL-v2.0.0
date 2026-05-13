@@ -151,7 +151,7 @@ else
     # ── Fallback: direct install ──────────────────────────────
     log "check_deps.py not found, installing directly..."
 
-    DEPS="flask flask-cors yt-dlp telethon cryptg aiofiles psutil requests requests[socks] openpyxl pillow gdown mega.py cloudscraper beautifulsoup4 lxml"
+    DEPS="flask flask-cors yt-dlp telethon cryptg aiofiles requests requests[socks] openpyxl pillow gdown mega.py cloudscraper beautifulsoup4 lxml"
 
     # Mirror list for pip fallback
     MIRRORS=(

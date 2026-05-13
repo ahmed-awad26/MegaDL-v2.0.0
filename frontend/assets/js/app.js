@@ -6,7 +6,8 @@
 
 MegaDL.App = (() => {
   const { API, Utils, Config, Router, Jobs, Downloader,
-          Settings, Files, Logs, Diagnostics, Search, PWA, Telegram } = MegaDL;
+          Settings, Files, Logs, Diagnostics, Search, PWA, Telegram,
+          WebsiteDownloader } = MegaDL;
   const { show, hide, toggle, haptic, formatBytes, formatRelativeTime,
           escapeHTML, store, debounce } = Utils;
 
@@ -21,6 +22,7 @@ MegaDL.App = (() => {
     Router.register('logs',        { onEnter: () => Logs.fetchLogs() });
     Router.register('diagnostics', { onEnter: () => Diagnostics.run() });
     Router.register('telegram',    { onEnter: () => Telegram.onEnter() });
+    Router.register('website',     { onEnter: () => WebsiteDownloader.checkHealth() });
     Router.register('downloads',   { onEnter: () => loadDownloads() });
     Router.register('history',     { onEnter: () => loadHistory() });
     Router.register('archive',     { onEnter: () => loadArchive() });
@@ -37,6 +39,7 @@ MegaDL.App = (() => {
     Logs.init();
     Diagnostics.init();
     Telegram.init();
+    WebsiteDownloader.init();
     Search.init();
     PWA.init();
     Jobs.init();
@@ -294,6 +297,27 @@ MegaDL.App = (() => {
     setInterval(_refreshStats, Config.statsPollInterval);
   }
 
+  function _renderRecentActivity(items) {
+    const list = document.getElementById('dash-recent-list');
+    if (!list) return;
+    if (!items || !items.length) {
+      list.innerHTML = '<div class="dash-recent-empty">No downloads yet</div>';
+      return;
+    }
+    list.innerHTML = items.map(item => {
+      const title = item.title || 'Unknown';
+      const size = formatBytes(item.total_bytes || 0);
+      const time = item.created_at ? formatRelativeTime(item.created_at) : '';
+      const icon = item.url && item.url.includes('youtube') ? '🎬' :
+                   item.url && item.url.includes('telegram') ? '✈️' : '📄';
+      return `<div class="dash-recent-item">
+        <span class="dash-recent-icon">${icon}</span>
+        <span class="dash-recent-title" title="${escapeHTML(title)}">${escapeHTML(title)}</span>
+        <span class="dash-recent-meta">${size} · ${time}</span>
+      </div>`;
+    }).join('');
+  }
+
   async function _refreshStats() {
     try {
       const stats = await API.getStats();
@@ -302,14 +326,75 @@ MegaDL.App = (() => {
       Utils.setText('stat-done',   stats.done    || 0);
       Utils.setText('stat-size',   formatBytes(stats.total_bytes || 0));
 
+      // Today badge
+      const todayBadge = document.getElementById('stat-today-badge');
+      if (todayBadge) {
+        const today = stats.today || 0;
+        if (today > 0) {
+          todayBadge.textContent = `+${today} today`;
+          todayBadge.style.display = 'block';
+        } else {
+          todayBadge.style.display = 'none';
+        }
+      }
+
+      // Queued + failed
+      const queuedEl = document.getElementById('stat-queued');
+      if (queuedEl) queuedEl.textContent = `${stats.queued || 0} queued`;
+      const failedEl = document.getElementById('stat-failed');
+      if (failedEl) failedEl.textContent = `${stats.failed || 0} failed`;
+
       // Storage bar
       if (stats.storage) {
-        const pct = (stats.storage.used / stats.storage.total * 100).toFixed(1);
+        const pct = Math.min((stats.storage.used / stats.storage.total * 100), 100).toFixed(1);
         const fill = document.getElementById('storage-fill');
         const text = document.getElementById('storage-text');
+        const outer = document.getElementById('dash-storage');
         if (fill) fill.style.width = `${pct}%`;
         if (text) text.textContent = `${formatBytes(stats.storage.used)} / ${formatBytes(stats.storage.total)}`;
+        if (outer) {
+          outer.style.display = 'block';
+          if (parseFloat(pct) > 90) {
+            fill.style.background = 'var(--danger, #ef4444)';
+          } else if (parseFloat(pct) > 75) {
+            fill.style.background = 'var(--warning, #f59e0b)';
+          } else {
+            fill.style.background = '';
+          }
+        }
+      } else {
+        const outer = document.getElementById('dash-storage');
+        if (outer) outer.style.display = 'none';
       }
+
+      // System info
+      if (stats.system) {
+        const setVer = (id, ver) => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = ver || 'not found';
+        };
+        const setDot = (id, ok) => {
+          const el = document.getElementById(id);
+          if (el) el.className = `dash-system-dot ${ok ? 'online' : 'offline'}`;
+        };
+        setDot('sys-ytdlp-dot', !!stats.system.ytdlp_version);
+        setVer('sys-ytdlp-ver', stats.system.ytdlp_version);
+        setDot('sys-ffmpeg-dot', !!stats.system.ffmpeg_version);
+        setVer('sys-ffmpeg-ver', stats.system.ffmpeg_version);
+        setDot('sys-py-dot', !!stats.system.python_version);
+        setVer('sys-py-ver', stats.system.python_version);
+      }
+
+      // Backend indicator in dashboard
+      const beLabel = document.getElementById('dash-backend-label');
+      const beDot = document.getElementById('dash-dot');
+      const backend = API.getBackend();
+      if (beLabel) beLabel.textContent = backend ? `${backend.charAt(0).toUpperCase() + backend.slice(1)} Backend` : 'Disconnected';
+      if (beDot) beDot.className = `backend-dot ${backend ? 'online' : 'error'}`;
+
+      // Recent activity
+      _renderRecentActivity(stats.recent);
+
     } catch {}
   }
 

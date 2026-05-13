@@ -269,12 +269,7 @@ MegaDL.Settings = (() => {
         return;
       }
       // Also test via backend
-      const res = await fetch('/api/settings/test-dl-folder', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ path }),
-      });
-      const data = await res.json();
+      const data = await API.testDlFolder(path);
       if (data.writable) {
         if (status) { status.textContent = '✅ Path is writable!'; status.style.color = 'var(--success)'; }
         MegaDL.App?.toast('✅ Download folder is writable', 'success');
@@ -669,9 +664,8 @@ MegaDL.Settings = (() => {
       }
       // Load existing key
       try {
-        const res = await fetch('/api/api-keys');
-        const data = await res.json();
-        const keys = data.keys || {};
+        const res = await API.getApiKeys();
+        const keys = res.keys || {};
         if (keys[provider]) {
           if (keyInput) keyInput.value = '';
           if (keyInput) keyInput.placeholder = keys[provider];
@@ -707,12 +701,7 @@ MegaDL.Settings = (() => {
     if (status) { status.textContent = '⏳ Validating...'; status.style.color = 'var(--text-muted)'; }
 
     try {
-      const res = await fetch('/api/api-keys/validate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ provider, key: apiKey }),
-      });
-      const data = await res.json();
+      const data = await API.validateApiKey(provider, apiKey);
       if (data.valid) {
         if (status) { status.textContent = `✅ ${data.message || 'Valid!'}`; status.style.color = 'var(--success)'; }
         MegaDL.App?.toast(`✅ ${provider} API key is valid!`, 'success');

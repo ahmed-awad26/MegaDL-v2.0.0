@@ -124,8 +124,8 @@ update_deps() {
             || warn "Some packages may have failed — check manually"
     else
         # Install core packages individually
-        $PIP_CMD install --upgrade flask flask-cors yt-dlp telethon cryptg aiofiles psutil requests openpyxl pillow 2>/dev/null \
-            || $PIP_CMD install --upgrade flask flask-cors yt-dlp telethon cryptg aiofiles psutil requests openpyxl pillow --break-system-packages 2>/dev/null \
+        $PIP_CMD install --upgrade flask flask-cors yt-dlp telethon cryptg aiofiles requests openpyxl pillow 2>/dev/null \
+            || $PIP_CMD install --upgrade flask flask-cors yt-dlp telethon cryptg aiofiles requests openpyxl pillow --break-system-packages 2>/dev/null \
             || warn "Some packages may have failed — check manually"
     fi
 

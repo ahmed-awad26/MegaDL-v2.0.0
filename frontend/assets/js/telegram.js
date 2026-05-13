@@ -156,6 +156,18 @@ MegaDL.Telegram = (() => {
 
     try {
       const res = await API.tgSendCode(phone);
+      if (res.code_previously_sent) {
+        loginPhone = phone;
+        _showLoginForm('tg-form-code');
+        const _cd = $('tg-code-display');
+        if (_cd) {
+          _cd.textContent = 'Code already sent via Telegram/SMS. Enter it below.';
+          _cd.className = 'tg-code-info tg-warning';
+        }
+        $('tg-code-input')?.focus();
+        MegaDL.App?.toast('⚠️ A code was previously sent — enter it below', 'warning');
+        return;
+      }
       if (res.error) {
         // Handle specific error codes
         if (res.code === 'ALL_OPTIONS_USED') {
