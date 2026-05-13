@@ -216,6 +216,10 @@ class Database:
 
     def update_job(self, job_id: str, fields: dict):
         fields['updated_at'] = _now()
+        # Serialize dict/list values to JSON for SQLite binding
+        for k, v in fields.items():
+            if isinstance(v, (dict, list)):
+                fields[k] = json.dumps(v)
         cols = ', '.join(f'{k} = :{k}' for k in fields)
         fields['id'] = job_id
         with self._lock, self.conn() as con:

@@ -681,11 +681,12 @@ class YtdlpService:
         channel_id = ''
         channel_name = ''
         try:
+            sock_timeout = str(opts.get('timeout', self.settings.get('timeout', 30)))
             info_cmd = [ytdlp, '--dump-json', '--no-playlist',
                         '--no-warnings', '--skip-download', url,
-                        '--socket-timeout', '15']
+                        '--socket-timeout', sock_timeout]
             ir = subprocess.run(info_cmd, capture_output=True, text=True,
-                                encoding='utf-8', errors='replace', timeout=30)
+                                encoding='utf-8', errors='replace', timeout=int(sock_timeout) + 15)
             if ir.returncode == 0 and ir.stdout.strip():
                 info = json.loads(ir.stdout.strip().split('\n')[0])
                 channel_id = info.get('channel_id') or info.get('channel_url', '').split('/')[-1] or ''
@@ -950,13 +951,14 @@ class YtdlpService:
         # Quick info extract for smart folder structure
         info_data = {}
         try:
+            sock_timeout = str(opts.get('timeout', self.settings.get('timeout', 30)))
             info_cmd = [
                 ytdlp, '--dump-json', '--no-playlist',
                 '--no-warnings', '--skip-download', url,
-                '--socket-timeout', '15',
+                '--socket-timeout', sock_timeout,
             ]
             ir = subprocess.run(info_cmd, capture_output=True, text=True,
-                                encoding='utf-8', errors='replace', timeout=30)
+                                encoding='utf-8', errors='replace', timeout=int(sock_timeout) + 15)
             if ir.returncode == 0 and ir.stdout.strip():
                 info_data = json.loads(ir.stdout.strip().split('\n')[0])
         except Exception:
