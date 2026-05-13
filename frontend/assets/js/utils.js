@@ -149,6 +149,8 @@ MegaDL.Utils = (() => {
 
   /* ── DOM helpers ─────────────────────────────────────────── */
 
+  const $ = id => document.getElementById(id);
+
   function qs(selector, root = document) {
     return root.querySelector(selector);
   }
@@ -173,22 +175,22 @@ MegaDL.Utils = (() => {
   }
 
   function setHTML(selector, html) {
-    const node = typeof selector === 'string' ? qs(selector) : selector;
+    const node = typeof selector === 'string' ? document.getElementById(selector) : selector;
     if (node) node.innerHTML = html;
   }
 
   function setText(selector, text) {
-    const node = typeof selector === 'string' ? qs(selector) : selector;
+    const node = typeof selector === 'string' ? document.getElementById(selector) : selector;
     if (node) node.textContent = text;
   }
 
   function show(el, display = 'flex') {
-    const node = typeof el === 'string' ? qs(el) : el;
+    const node = typeof el === 'string' ? document.getElementById(el) : el;
     if (node) node.style.display = display;
   }
 
   function hide(el) {
-    const node = typeof el === 'string' ? qs(el) : el;
+    const node = typeof el === 'string' ? document.getElementById(el) : el;
     if (node) node.style.display = 'none';
   }
 
@@ -400,7 +402,7 @@ MegaDL.Utils = (() => {
     formatBytes, formatSpeed, formatDuration, formatETA,
     formatDate, formatRelativeTime, formatNumber,
     parseUrls, sanitizeUrl, getDomainLabel, getSiteIcon, getFileIcon,
-    qs, qsa, el, setHTML, setText, show, hide, toggle,
+    $, qs, qsa, el, setHTML, setText, show, hide, toggle,
     addRipple, haptic,
     copyToClipboard, readClipboard,
     safeFilename, debounce, throttle, uuid,
