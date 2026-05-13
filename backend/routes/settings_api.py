@@ -26,7 +26,7 @@ def save_settings_route():
 
 @settings_bp.route('/api/settings/validate-youtube-key', methods=['POST'])
 def validate_youtube_key():
-    """Validate a YouTube Data API v3 key by calling the channels/list endpoint."""
+    """Validate a YouTube Data API v3 key by calling videos?chart=mostPopular (works with API keys)."""
     data = request.get_json(force=True) or {}
     api_key = data.get('api_key', '').strip()
 
@@ -34,7 +34,7 @@ def validate_youtube_key():
         return err('API key is required')
 
     try:
-        url = f'https://www.googleapis.com/youtube/v3/channels?part=id&mine=false&maxResults=1&key={api_key}'
+        url = f'https://www.googleapis.com/youtube/v3/videos?part=id&chart=mostPopular&maxResults=1&key={api_key}'
         req = urllib.request.Request(url, headers={'User-Agent': 'MegaDL/2.0'})
         with urllib.request.urlopen(req, timeout=10) as resp:
             body = json.loads(resp.read().decode())
