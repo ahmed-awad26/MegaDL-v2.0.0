@@ -37,7 +37,7 @@ MegaDL.API = (() => {
 
       // Try PHP backend
       try {
-        const res = await fetch(`${phpBasePath}/ping.php`, {
+        const res = await fetch(`${phpBasePath}/ping`, {
           signal: AbortSignal.timeout(3000),
         });
         if (res.ok) {
@@ -78,7 +78,7 @@ MegaDL.API = (() => {
 
     const base = activeBackend === 'python'
       ? `${pythonBaseUrl}${path}`
-      : `${phpBasePath}${path}.php`;
+      : `${phpBasePath}${path}`;
 
     const defaults = {
       headers: { 'Content-Type': 'application/json', 'X-MegaDL-Client': '1' },

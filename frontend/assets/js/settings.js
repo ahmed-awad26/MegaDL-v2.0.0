@@ -123,8 +123,9 @@ MegaDL.Settings = (() => {
       store.set('settings', current);
     });
 
-    // YouTube API key validation
+    // YouTube API key validation + save
     document.getElementById('validate-youtube-key-btn')?.addEventListener('click', validateYoutubeKey);
+    document.getElementById('save-youtube-key-btn')?.addEventListener('click', saveYoutubeKey);
 
     // Dependencies check
     document.getElementById('check-deps-btn')?.addEventListener('click', checkDependencies);
@@ -322,6 +323,36 @@ MegaDL.Settings = (() => {
       status.style.color = 'var(--error)';
     } finally {
       if (btn) { btn.disabled = false; btn.textContent = 'Validate'; }
+    }
+  }
+
+  async function saveYoutubeKey() {
+    const input = document.getElementById('s-youtube-api-key');
+    const status = document.getElementById('youtube-key-status');
+    if (!input || !status) return;
+
+    const apiKey = input.value.trim();
+    if (!apiKey) {
+      status.textContent = '❌ Enter an API key first';
+      status.style.color = 'var(--error)';
+      return;
+    }
+
+    const btn = document.getElementById('save-youtube-key-btn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+
+    try {
+      current.youtube_api_key = apiKey;
+      store.set('settings', current);
+      await API.saveSettings({ youtube_api_key: apiKey });
+      status.textContent = '✅ Saved';
+      status.style.color = 'var(--success)';
+      MegaDL.App?.toast('✅ YouTube API key saved!', 'success');
+    } catch (err) {
+      status.textContent = `❌ ${err.message}`;
+      status.style.color = 'var(--error)';
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = '💾 Save'; }
     }
   }
 

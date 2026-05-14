@@ -188,10 +188,11 @@ MegaDL.Downloader = (() => {
             'all_uncategorized', 'latest_since_last_run'].includes(mode);
   }
 
-  function _showPlaylistSelector(url, playlists) {
-    // Remove existing modal
+  function _showPlaylistSelector(url, playlists, mode) {
     const old = document.getElementById('playlist-selector-modal');
     if (old) old.remove();
+
+    const includeUploads = mode === 'playlists_and_uploads' || mode === 'all_uncategorized';
 
     const modal = document.createElement('div');
     modal.id = 'playlist-selector-modal';
@@ -206,7 +207,7 @@ MegaDL.Downloader = (() => {
         </div>
         <div class="modal-body" style="flex:1;overflow-y:auto;padding:12px 0">
           <div style="padding:0 16px 12px;font-size:0.82rem;color:var(--text-muted)">
-            Select the playlists you want to download from this channel
+            Select the playlists to download from this channel
           </div>
           <div id="playlist-list">
             ${playlists.map((p, i) => `
@@ -220,6 +221,7 @@ MegaDL.Downloader = (() => {
               </label>
             `).join('')}
           </div>
+          ${includeUploads ? '<div style="padding:8px 16px 0;font-size:0.82rem;color:var(--text-muted)">⬆️ Channel uploads will also be downloaded</div>' : ''}
         </div>
         <div class="modal-footer" style="padding:12px 16px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--glass-border)">
           <button class="btn btn-secondary" id="pl-select-all">Select All</button>
@@ -244,20 +246,28 @@ MegaDL.Downloader = (() => {
         return;
       }
       modal.remove();
-      _queuePlaylistDownloads(url, selected);
+      _queuePlaylistDownloads(url, selected, mode);
     });
   }
 
-  async function _queuePlaylistDownloads(channelUrl, playlistIds) {
+  async function _queuePlaylistDownloads(channelUrl, playlistIds, mode) {
     if (!playlistIds.length) return;
     const opts = _buildOptions();
-    const urls = playlistIds.map(pid => `${channelUrl}?list=${pid}`);
+    const sep = channelUrl.includes('?') ? '&' : '?';
+    const urls = playlistIds.map(pid => `${channelUrl}${sep}list=${pid}`);
 
-    MegaDL.App?.toast(`⬇ Queueing ${urls.length} playlists...`, 'info');
+    // Also queue uploads if mode requires it
+    const includeUploads = mode === 'playlists_and_uploads' || mode === 'all_uncategorized';
+
+    MegaDL.App?.toast(`⬇ Queueing ${urls.length} playlists${includeUploads ? ' + uploads' : ''}...`, 'info');
     try {
       await API.startBatch(urls, { ...opts, max_parallel: 2 });
+      if (includeUploads) {
+        await API.startDownload(channelUrl, { ...opts, mode: 'uploads_only' });
+      }
       haptic('success');
-      MegaDL.App?.toast(`✅ ${urls.length} playlists queued!`, 'success');
+      MegaDL.App?.toast(`✅ Downloading ${urls.length} playlist(s)${includeUploads ? ' + uploads' : ''}!`, 'success');
+      _resetAfterDownload();
       MegaDL.Router.navigate('active');
       MegaDL.Jobs.forceRefresh();
     } catch (err) {
@@ -311,7 +321,8 @@ MegaDL.Downloader = (() => {
       try {
         const res = await API.getChannelPlaylists(safeUrl);
         if (res.playlists && res.playlists.length > 0) {
-          _showPlaylistSelector(safeUrl, res.playlists);
+          const currentMode = $('channel-mode-select')?.value || 'playlists_only';
+          _showPlaylistSelector(safeUrl, res.playlists, currentMode);
           haptic('success');
         } else if (res.needs_api_key) {
           MegaDL.App?.toast('⚠️ YouTube API key needed. Go to Settings → Integrations.', 'warning');
@@ -605,32 +616,37 @@ MegaDL.Downloader = (() => {
     if (format?.id)  opts.format_id  = format.id;
     if (format?.ext) opts.format_ext = format.ext;
 
-    // Handle YouTube channel modes — queue the channel URL with mode flag
+    // Handle YouTube channel modes
     if (_isChannelMode(opts.mode)) {
-      const btn = $('download-btn');
-      if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = `<span class="loading-spinner sm"></span><span>Queuing channel...</span>`;
-      }
-      try {
-        // For channel modes, queue the channel URL directly — backend handles the logic
-        const res = await API.startDownload(safeUrl, opts);
-        haptic('success');
-        const modeLabels = {
-          playlists_only: '📂 Playlists',
-          uploads_only: '📤 Uploads',
-          playlists_and_uploads: '📂+📤 Playlists+Uploads',
-          all_uncategorized: '📂+📤+📁 All+Uncategorized',
-          latest_since_last_run: '🆕 Latest',
-        };
-        MegaDL.App?.toast(`⬇️ ${modeLabels[opts.mode] || opts.mode} queued!`, 'success');
-        _resetAfterDownload();
-        MegaDL.Router.navigate('active');
-      } catch (err) {
-        MegaDL.App?.toast(`❌ ${err.message}`, 'error');
-      } finally {
-        const btn2 = $('download-btn');
-        if (btn2) { btn2.disabled = false; btn2.innerHTML = `<span>⬇️ Download</span>`; }
+      const modesWithPlaylists = ['playlists_only', 'playlists_and_uploads', 'all_uncategorized'];
+      const needsPlaylistPicker = modesWithPlaylists.includes(opts.mode);
+
+      if (needsPlaylistPicker && _isChannelUrl(safeUrl)) {
+        // Fetch playlists and show selector
+        const btn = $('download-btn');
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = `<span class="loading-spinner sm"></span><span>Loading playlists...</span>`;
+        }
+        try {
+          const res = await API.getChannelPlaylists(safeUrl);
+          if (res.playlists && res.playlists.length > 0) {
+            _showPlaylistSelector(safeUrl, res.playlists, opts.mode);
+            haptic('success');
+          } else if (res.needs_api_key) {
+            MegaDL.App?.toast('⚠️ YouTube API key needed. Go to Settings → Integrations.', 'warning');
+            _resetResetBtn();
+          } else {
+            // No playlists found — fall back to direct channel queue
+            await _queueChannelDirect(safeUrl, opts);
+          }
+        } catch (err) {
+          MegaDL.App?.toast(`❌ ${err.message}`, 'error');
+          _resetResetBtn();
+        }
+      } else {
+        // uploads_only / latest_since_last_run — queue directly
+        await _queueChannelDirect(safeUrl, opts);
       }
       return;
     }
@@ -660,6 +676,36 @@ MegaDL.Downloader = (() => {
         btn2.innerHTML = `<span>⬇️ Download</span>`;
       }
     }
+  }
+
+  async function _queueChannelDirect(url, opts) {
+    const btn = $('download-btn');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<span class="loading-spinner sm"></span><span>Queuing channel...</span>`;
+    }
+    try {
+      await API.startDownload(url, opts);
+      haptic('success');
+      const modeLabels = {
+        playlists_only: '📂 Playlists',
+        uploads_only: '📤 Uploads',
+        playlists_and_uploads: '📂+📤 Playlists+Uploads',
+        all_uncategorized: '📂+📤+📁 All+Uncategorized',
+        latest_since_last_run: '🆕 Latest',
+      };
+      MegaDL.App?.toast(`⬇️ ${modeLabels[opts.mode] || opts.mode} queued!`, 'success');
+      _resetAfterDownload();
+      MegaDL.Router.navigate('active');
+    } catch (err) {
+      MegaDL.App?.toast(`❌ ${err.message}`, 'error');
+      _resetResetBtn();
+    }
+  }
+
+  function _resetResetBtn() {
+    const btn = $('download-btn');
+    if (btn) { btn.disabled = false; btn.innerHTML = `<span>⬇️ Download</span>`; }
   }
 
   function _resetAfterDownload() {

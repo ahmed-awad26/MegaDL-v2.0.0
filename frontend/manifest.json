@@ -32,7 +32,5 @@
       "icons": [{ "src": "assets/icons/icon-96.png", "sizes": "96x96" }]
     }
   ],
-  "screenshots": [
-    { "src": "assets/screenshots/home.png", "sizes": "390x844", "type": "image/png", "form_factor": "narrow" }
-  ]
+  "screenshots": []
 }

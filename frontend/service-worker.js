@@ -23,6 +23,8 @@ const PRECACHE_URLS = [
   '/assets/js/downloader.js',
   '/assets/js/settings.js',
   '/assets/js/files.js',
+  '/assets/js/telegram.js',
+  '/assets/js/website.js',
   '/assets/js/app.js',
   'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap',
 ];
