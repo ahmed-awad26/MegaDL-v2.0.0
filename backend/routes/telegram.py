@@ -137,10 +137,10 @@ def tg_messages():
 def tg_download():
     """Download media from Telegram messages."""
     data = request.get_json(force=True) or {}
-    dialog_id = data.get('dialog_id', type=int)
+    dialog_id = int(data.get('dialog_id') or 0)
     msg_ids = data.get('msg_ids', [])
     dl_folder = data.get('dl_folder', '')
-    mode = data.get('mode', 'account')  # 'account' or 'bot'
+    mode = data.get('mode', 'account')
     bot_token = data.get('bot_token', '')
 
     if not dialog_id or not msg_ids:
@@ -375,10 +375,10 @@ def tg_resume_init():
     """Initialize a resumable download job."""
     data = request.get_json(force=True) or {}
     job_id = data.get('job_id', '')
-    dialog_id = data.get('dialog_id', type=int)
-    msg_id = data.get('msg_id', type=int)
+    dialog_id = int(data.get('dialog_id') or 0)
+    msg_id = int(data.get('msg_id') or 0)
     dest_path = data.get('dest_path', '')
-    total_size = data.get('total_size', 0, type=int)
+    total_size = int(data.get('total_size') or 0)
     if not all([job_id, dialog_id, msg_id, dest_path]):
         return err('job_id, dialog_id, msg_id, dest_path required')
     try:
@@ -396,7 +396,7 @@ def tg_resume_progress():
     """Update download progress."""
     data = request.get_json(force=True) or {}
     job_id = data.get('job_id', '')
-    downloaded = data.get('downloaded_bytes', 0, type=int)
+    downloaded = int(data.get('downloaded_bytes') or 0)
     if not job_id:
         return err('job_id required')
     try:
@@ -522,7 +522,7 @@ def tg_bot_success():
     """Record a successful download for a bot."""
     data = request.get_json(force=True) or {}
     token = data.get('token', '')
-    speed = data.get('speed_bps', 0, type=float)
+    speed = float(data.get('speed_bps') or 0)
     if not token:
         return err('token required')
     try:
